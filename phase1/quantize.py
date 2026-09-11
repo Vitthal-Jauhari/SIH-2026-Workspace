@@ -57,7 +57,7 @@ def quantize(model_path: Path, data_dir: Path, out_dir: Path):
         tflite_model = converter.convert()
 
     out_dir.mkdir(parents=True, exist_ok=True)
-    out_path = out_dir / "vikramedge_phase1_int8.tflite"
+    out_path = out_dir / "vaani_int8.tflite"
     out_path.write_bytes(tflite_model)
 
     size_kb = len(tflite_model) / 1024

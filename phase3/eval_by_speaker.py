@@ -8,7 +8,7 @@ aggregate accuracy (which Phase 2's eval_wav.py already gives you).
 
 Run:
     python eval_by_speaker.py \
-        --tflite_path ./artifacts/vikramedge_phase3_int8.tflite \
+        --tflite_path ../phase1/artifacts/vaani_int8.tflite \
         --speakers_dir ./data/speakers \
         --held_out_speakers charlie dana
 """
@@ -19,7 +19,7 @@ from pathlib import Path
 
 import numpy as np
 
-for _cand in [Path(__file__).resolve().parent.parent / "phase2", Path(__file__).resolve().parent.parent / "vikramedge_phase2", Path(__file__).resolve().parent]:
+for _cand in [Path(__file__).resolve().parent.parent / "phase2", Path(__file__).resolve().parent]:
     if (_cand / "inference.py").exists():
         sys.path.insert(0, str(_cand))
         break

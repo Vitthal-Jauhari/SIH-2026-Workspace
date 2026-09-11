@@ -1,6 +1,6 @@
 """
 Phase 1 - Step 1: Download Google Speech Commands v0.02 and organize negative classes
-(unknown and silence) for VikramEdge prototyping.
+(unknown and silence) for Vaani prototyping.
 
 "unknown" is built by sampling across Speech Commands words so the model learns
 a broad "not wake-word" boundary.

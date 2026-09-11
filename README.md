@@ -1,4 +1,4 @@
-# VikramEdge — Edge Wake-Word Detection Pipeline ("Vaani")
+# Vaani — Edge Wake-Word Detection Pipeline
 
 An end-to-end keyword spotting (KWS) pipeline designed for ultra-low-power microcontrollers (e.g. ESP32-S3) with an INT8 model size under 256 KB (~13.7 KB).
 
@@ -9,7 +9,7 @@ An end-to-end keyword spotting (KWS) pipeline designed for ultra-low-power micro
 This repository is structured into three self-contained development phases:
 
 ```text
-vikramedge/
+vaani/
 ├── phase1/    # Prototype, DS-CNN Model, Training & INT8 Quantization
 ├── phase2/    # PC-Side Validation (Offline WAV Evaluation & Live Mic Stream)
 ├── phase3/    # Real Speaker Diversity, Audio Augmentation & Holdout Evaluation
@@ -59,11 +59,11 @@ pip install -r requirements.txt
 
 # Offline batch evaluation: accuracy, FAR, FRR on held-out Vaani test voices
 python eval_wav.py \
-    --tflite_path ../phase1/artifacts/vikramedge_phase1_int8.tflite \
+    --tflite_path ../phase1/artifacts/vaani_int8.tflite \
     --data_dir ../phase1/data/vaani_processed/testing
 
 # Live microphone detection: rolling 1-second buffer testing
-python mic_stream.py --tflite_path ../phase1/artifacts/vikramedge_phase1_int8.tflite --threshold 0.7
+python mic_stream.py --tflite_path ../phase1/artifacts/vaani_int8.tflite --threshold 0.7
 ```
 
 ---
@@ -97,7 +97,7 @@ python merge_with_phase1.py \
 
 # Step E: Evaluate generalization gap on seen vs. unseen voices
 python eval_by_speaker.py \
-    --tflite_path ../phase1/artifacts/vikramedge_phase1_int8.tflite \
+    --tflite_path ../phase1/artifacts/vaani_int8.tflite \
     --speakers_dir ./data/speakers \
     --held_out_speakers charlie
 ```

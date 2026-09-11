@@ -1,4 +1,4 @@
-# VikramEdge — Phase 3: Speaker Diversity Experiment
+# Vaani — Phase 3: Speaker Diversity Experiment
 
 Tests whether the model generalizes beyond the Speech Commands crowd to your
 own real speakers, with some speakers held out entirely so "testing"
@@ -54,7 +54,7 @@ python ../phase1/quantize.py --model_path ./artifacts/final_model.keras \
 ### 6. The metric that actually matters: seen vs. unseen accuracy
 ```bash
 python eval_by_speaker.py \
-    --tflite_path ../phase1/artifacts/vikramedge_phase1_int8.tflite \
+    --tflite_path ../phase1/artifacts/vaani_int8.tflite \
     --speakers_dir ./data/speakers \
     --held_out_speakers charlie dana
 ```

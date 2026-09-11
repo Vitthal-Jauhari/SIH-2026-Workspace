@@ -19,8 +19,7 @@ import sys
 for _candidate in [
     Path(__file__).resolve().parent.parent / "phase1",
     Path(__file__).resolve().parent.parent / "files",
-    Path(__file__).resolve().parent.parent / "vikramedge_phase1",
-    Path(__file__).resolve().parent,
+        Path(__file__).resolve().parent,
 ]:
     if (_candidate / "features.py").exists():
         sys.path.insert(0, str(_candidate))

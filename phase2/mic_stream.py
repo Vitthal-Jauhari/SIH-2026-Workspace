@@ -6,7 +6,7 @@ the closest PC analogue to what the ESP32 will do in Phase 5 (no fixed
 "press to record" -- the model has to make a decision on rolling audio).
 
 Run:
-    python mic_stream.py --tflite_path ../vikramedge_phase1/artifacts/vikramedge_phase1_int8.tflite
+    python mic_stream.py --tflite_path ../phase1/artifacts/vaani_int8.tflite
 
 Press Ctrl+C to stop. Prints a line whenever "yes" or "no" is detected
 above --threshold, plus a running detections/minute count you can use as a

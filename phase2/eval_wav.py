@@ -12,8 +12,8 @@ matter for a wake-word system (not just accuracy).
     RAM usage                 peak resident memory during inference
 
 Run:
-    python eval_wav.py --tflite_path ../vikramedge_phase1/artifacts/vikramedge_phase1_int8.tflite \
-                        --data_dir ../vikramedge_phase1/data/processed/testing
+    python eval_wav.py --tflite_path ../phase1/artifacts/vaani_int8.tflite \
+                        --data_dir ../phase1/data/vaani_processed/testing
 """
 
 import argparse

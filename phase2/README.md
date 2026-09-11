@@ -1,4 +1,4 @@
-# VikramEdge — Phase 2: Test on PC
+# Vaani — Phase 2: Test on PC
 
 Validates the Phase 1 `.tflite` model off real audio before any microcontroller work:
 first on static WAV files, then on a live PC mic stream.
@@ -7,7 +7,7 @@ first on static WAV files, then on a live PC mic stream.
 ```bash
 pip install -r requirements.txt
 ```
-Expects Phase 1's model at `../phase1/artifacts/vikramedge_phase1_int8.tflite`
+Expects Phase 1's model at `../phase1/artifacts/vaani_int8.tflite`
 (pass a different path with `--tflite_path` if yours lives elsewhere).
 
 ## 1. WAV files → Model → Prediction
@@ -17,7 +17,7 @@ actually matter for a wake-word system:
 
 ```bash
 python eval_wav.py \
-    --tflite_path ../phase1/artifacts/vikramedge_phase1_int8.tflite \
+    --tflite_path ../phase1/artifacts/vaani_int8.tflite \
     --data_dir ../phase1/data/vaani_processed/testing
 ```
 
@@ -33,7 +33,7 @@ the wake word), **False Rejection Rate** (wake word missed), per-inference laten
 
 ## 2. 🎤 Live PC microphone → Preprocessing → Model → Prediction
 ```bash
-python mic_stream.py --tflite_path ../phase1/artifacts/vikramedge_phase1_int8.tflite
+python mic_stream.py --tflite_path ../phase1/artifacts/vaani_int8.tflite
 ```
 Runs a sliding 1-second window (default 0.2s hop) over your mic input —
 the same rolling-buffer pattern the ESP32 will use, rather than

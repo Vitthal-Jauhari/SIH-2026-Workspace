@@ -6,7 +6,7 @@ e.g. Windows without dev mode / admin rights).
 
 Run:
     python merge_with_phase1.py \
-        --phase1_dir ../vikramedge_phase1/data/processed \
+        --phase1_dir ../phase1/data/processed \
         --phase3_dir ./data/speakers_processed \
         --out_dir ./data/combined
 """

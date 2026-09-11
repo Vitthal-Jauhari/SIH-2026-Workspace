@@ -10,7 +10,7 @@ real generalization).
 
 Run:
     python augment.py --in_dir ./data/speakers --out_dir ./data/speakers_augmented \
-                       --noise_dir ../vikramedge_phase1/data/raw/_background_noise_ \
+                       --noise_dir ../phase1/data/raw/_background_noise_ \
                        --copies_per_file 4
 """
 

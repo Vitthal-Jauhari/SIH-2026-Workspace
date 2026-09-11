@@ -1,4 +1,4 @@
-# VikramEdge — Phase 1: Prototype (no ESP32)
+# Vaani — Phase 1: Prototype & Model Export
 
 Pipeline: Google Speech Commands (negative classes) + Vaani recordings (wake-word) → MFCC features → tiny DS-CNN → INT8 quant → TFLite.  
 Classes: `silence`, `unknown`, `vaani` (3-class model).
@@ -62,7 +62,7 @@ python quantize.py --model_path ./artifacts/final_model.keras --data_dir ./data/
 ### 6. Evaluate WAV-level performance
 Evaluate accuracy, False Acceptance Rate (FAR), False Rejection Rate (FRR), and latency on held-out test data (using Phase 2's evaluation script):
 ```bash
-python ../phase2/eval_wav.py --tflite_path ./artifacts/vikramedge_phase1_int8.tflite --data_dir ./data/vaani_processed/testing
+python ../phase2/eval_wav.py --tflite_path ./artifacts/vaani_int8.tflite --data_dir ./data/vaani_processed/testing
 ```
 
 ## Notes / design decisions
