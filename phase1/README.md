@@ -60,9 +60,9 @@ python quantize.py --model_path ./artifacts/final_model.keras --data_dir ./data/
 ```
 
 ### 6. Evaluate WAV-level performance
-Evaluate accuracy, False Acceptance Rate (FAR), False Rejection Rate (FRR), and latency on held-out test data:
+Evaluate accuracy, False Acceptance Rate (FAR), False Rejection Rate (FRR), and latency on held-out test data (using Phase 2's evaluation script):
 ```bash
-python eval_wav.py --tflite_path ./artifacts/vikramedge_phase1_int8.tflite --data_dir ./data/vaani_processed/testing
+python ../phase2/eval_wav.py --tflite_path ./artifacts/vikramedge_phase1_int8.tflite --data_dir ./data/vaani_processed/testing
 ```
 
 ## Notes / design decisions

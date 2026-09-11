@@ -1,6 +1,6 @@
-# VikramEdge — Edge Wake-Word Detection Pipeline
+# VikramEdge — Edge Wake-Word Detection Pipeline ("Vaani")
 
-An end-to-end keyword spotting (KWS) pipeline designed for ultra-low-power microcontrollers (e.g. ESP32-S3) with an INT8 model size under 256 KB.
+An end-to-end keyword spotting (KWS) pipeline designed for ultra-low-power microcontrollers (e.g. ESP32-S3) with an INT8 model size under 256 KB (~13.7 KB).
 
 ---
 
@@ -10,50 +10,94 @@ This repository is structured into three self-contained development phases:
 
 ```text
 vikramedge/
-├── phase1/    # Prototype, Model Architecture & INT8 Quantization
-├── phase2/    # PC-Side Validation (Offline WAVs & Live Mic Stream)
+├── phase1/    # Prototype, DS-CNN Model, Training & INT8 Quantization
+├── phase2/    # PC-Side Validation (Offline WAV Evaluation & Live Mic Stream)
 ├── phase3/    # Real Speaker Diversity, Audio Augmentation & Holdout Evaluation
-└── .gitignore # Git ignore rules (filters out large raw audio >100MB)
+└── .gitignore # Filters out local data downloads & temporary caches
 ```
 
 ---
 
-## Phases Overview
+## End-to-End Walkthrough (When Your Dataset Arrives)
 
-### [Phase 1: Prototype & Model Export](./phase1/)
-- **Target Keyword**: Configured for 3-class detection (`silence`, `unknown`, `vaani`).
-- **Features**: MFCC (13 coefficients, 512 FFT, 256 hop @ 16 kHz).
-- **Architecture**: Depthwise-Separable CNN (DS-CNN).
-- **Quantization**: Full-integer INT8 post-training quantization (`~13.7 KB`, <256 KB budget).
-- **Quickstart**:
-  ```bash
-  cd phase1
-  pip install -r requirements.txt
-  python train.py --data_dir ./data/processed --out_dir ./artifacts
-  python quantize.py --model_path ./artifacts/final_model.keras
-  ```
+### 1. Phase 1: Setup & Train the Wake-Word Model
 
-### [Phase 2: PC-Side Validation](./phase2/)
-- **Offline Batch Evaluation**: Measures accuracy, False Acceptance Rate (FAR), False Rejection Rate (FRR), latency, and RAM usage on WAV test sets.
-- **Real-Time Mic Stream**: Rolling 1-second buffer detection with debounce cooldown.
-- **Quickstart**:
-  ```bash
-  cd phase2
-  pip install -r requirements.txt
-  python eval_wav.py --tflite_path ../phase1/artifacts/model_int8.tflite --data_dir ../phase1/data/processed/testing
-  python mic_stream.py --tflite_path ../phase1/artifacts/model_int8.tflite
-  ```
+```bash
+cd phase1
+pip install -r requirements.txt
 
-### [Phase 3: Real Speaker Diversity](./phase3/)
-- **Speaker Recording**: Ingest multiple real voices with variations in distance, pace, and volume.
-- **Augmentation**: Offline noise mixing, pitch shifting, speed variation, and gain adjustment.
-- **Speaker Holdout Split**: Partitions recordings by speaker identity to guarantee testing on completely unseen voices.
-- **Generalization Gap**: Evaluates model performance on seen vs. unseen speakers.
-- **Quickstart**:
-  ```bash
-  cd phase3
-  pip install -r requirements.txt
-  python record_speakers.py --speaker_id alice --reps 15
-  python augment.py --in_dir ./data/speakers --out_dir ./data/speakers_augmented
-  python speaker_split.py --in_dir ./data/speakers_augmented --out_dir ./data/speakers_processed --held_out_speakers charlie
-  ```
+# Step A: Download Speech Commands v0.02 to generate negative classes ("unknown" & "silence")
+python data_prep.py --data_dir ./data
+
+# Step B: Drop your Vaani recordings into phase1/data/vaani_raw organized by speaker:
+# data/vaani_raw/
+# ├── speaker_01/ (*.wav)
+# ├── speaker_02/ (*.wav)
+# └── speaker_03/ (*.wav)
+
+# Step C: Ingest Vaani recordings, hold out test speakers, and merge with negative classes
+python prepare_vaani_data.py \
+    --vaani_dir ./data/vaani_raw \
+    --speech_commands_dir ./data/processed \
+    --out_dir ./data/vaani_processed \
+    --held_out_speakers speaker_03
+
+# Step D: Train the 3-class DS-CNN model
+python train.py --data_dir ./data/vaani_processed --out_dir ./artifacts --epochs 40
+
+# Step E: Quantize to full-integer INT8 TFLite model (~13.7 KB)
+python quantize.py --model_path ./artifacts/final_model.keras --data_dir ./data/vaani_processed --out_dir ./artifacts
+```
+
+---
+
+### 2. Phase 2: Test on PC (WAVs & Live Mic)
+
+```bash
+cd ../phase2
+pip install -r requirements.txt
+
+# Offline batch evaluation: accuracy, FAR, FRR on held-out Vaani test voices
+python eval_wav.py \
+    --tflite_path ../phase1/artifacts/vikramedge_phase1_int8.tflite \
+    --data_dir ../phase1/data/vaani_processed/testing
+
+# Live microphone detection: rolling 1-second buffer testing
+python mic_stream.py --tflite_path ../phase1/artifacts/vikramedge_phase1_int8.tflite --threshold 0.7
+```
+
+---
+
+### 3. Phase 3: Real Speaker Diversity & Generalization
+
+```bash
+cd ../phase3
+pip install -r requirements.txt
+
+# Step A: Record real speakers saying target words
+python record_speakers.py --speaker_id alice --reps 15
+
+# Step B: Multiply recordings with noise/speed/pitch augmentation
+python augment.py \
+    --in_dir ./data/speakers \
+    --out_dir ./data/speakers_augmented \
+    --noise_dir ../phase1/data/raw/_background_noise_
+
+# Step C: Split speakers with unseen holdouts
+python speaker_split.py \
+    --in_dir ./data/speakers_augmented \
+    --out_dir ./data/speakers_processed \
+    --held_out_speakers charlie
+
+# Step D: Merge with base negative data
+python merge_with_phase1.py \
+    --phase1_dir ../phase1/data/processed \
+    --phase3_dir ./data/speakers_processed \
+    --out_dir ./data/combined
+
+# Step E: Evaluate generalization gap on seen vs. unseen voices
+python eval_by_speaker.py \
+    --tflite_path ../phase1/artifacts/vikramedge_phase1_int8.tflite \
+    --speakers_dir ./data/speakers \
+    --held_out_speakers charlie
+```
