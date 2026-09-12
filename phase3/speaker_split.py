@@ -1,90 +1,195 @@
 """
-Phase 3 - Step 3: Split augmented speaker recordings into train/validation/
-testing by SPEAKER, not by clip -- some speakers are held out completely so
-"testing" measures generalization to a genuinely unseen voice, matching
-Phase 1's methodology but applied to your real speakers instead of the
-Speech Commands crowd.
+Phase 3 - Step 2: Speaker-Level Split (Strictly Before Augmentation)
 
-Output layout matches Phase 1's `processed/` folder exactly (training/
-validation/testing/<label>/*.wav), so you can point train.py at either one,
-or merge them (see merge_with_phase1.py) to train on everything at once.
+Splits normalized recordings by SPEAKER into:
+- data/train/<speaker>/        (e.g. Ananya, Ark, Umang)
+- data/validation/<speaker>/   (e.g. Ishita)
+- data/test_unseen/<speaker>/  (e.g. Vitthal)
 
-Run:
-    python speaker_split.py --in_dir ./data/speakers_augmented \
-                             --out_dir ./data/speakers_processed \
-                             --held_out_speakers charlie dana
+Includes automated guardrails that abort immediately if any speaker leakage is detected.
+
+Usage:
+    python speaker_split.py --in_dir ./data/normalized \
+                            --out_dir ./data \
+                            --train_speakers Ananya Ark Umang \
+                            --val_speakers Ishita \
+                            --held_out_speakers Vitthal
 """
 
 import argparse
-import random
+import os
 import shutil
+import sys
 from pathlib import Path
 
 
-def main(args):
-    in_dir = Path(args.in_dir)
-    out_dir = Path(args.out_dir)
+def link_or_copy(src: Path, dest: Path):
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    if dest.exists():
+        return
+    try:
+        os.link(src.resolve(), dest)
+    except OSError:
+        shutil.copy(src, dest)
 
-    all_speakers = sorted([d.name for d in in_dir.iterdir() if d.is_dir()])
-    held_out = set(args.held_out_speakers)
-    missing = held_out - set(all_speakers)
+
+def split_speakers(
+    in_dir: Path,
+    out_dir: Path,
+    train_speakers: list,
+    val_speakers: list,
+    held_out_speakers: list,
+):
+    in_dir = in_dir.resolve()
+    out_dir = out_dir.resolve()
+
+    if not in_dir.exists():
+        raise FileNotFoundError(f"Normalized input directory not found: {in_dir}")
+
+    train_set = set(train_speakers)
+    val_set = set(val_speakers)
+    held_out_set = set(held_out_speakers)
+
+    print("=" * 65)
+    print("PHASE 3 - STEP 2: SPEAKER-LEVEL SPLIT")
+    print("=" * 65)
+    print(f"Train speakers       : {sorted(train_set)}")
+    print(f"Validation speakers  : {sorted(val_set)}")
+    print(f"Held-out Unseen test : {sorted(held_out_set)}\n")
+
+    # Guardrail 1: Disjoint configuration check
+    overlap_tv = train_set & val_set
+    overlap_th = train_set & held_out_set
+    overlap_vh = val_set & held_out_set
+
+    if overlap_tv or overlap_th or overlap_vh:
+        msg = (
+            f"ERROR: Overlap detected in speaker split configuration!\n"
+            f"Train & Val overlap: {overlap_tv}\n"
+            f"Train & Unseen overlap: {overlap_th}\n"
+            f"Val & Unseen overlap: {overlap_vh}\n"
+            f"Phase 3 aborted to prevent data leakage."
+        )
+        print(msg, file=sys.stderr)
+        raise RuntimeError(msg)
+
+    # Verify all configured speakers exist in normalized directory
+    available_speakers = {d.name for d in in_dir.iterdir() if d.is_dir()}
+    all_configured = train_set | val_set | held_out_set
+    missing = all_configured - available_speakers
     if missing:
-        print(f"WARNING: held-out speakers not found in data: {missing}")
+        msg = f"ERROR: Configured speakers not found in {in_dir}: {missing}"
+        print(msg, file=sys.stderr)
+        raise RuntimeError(msg)
 
-    remaining = [s for s in all_speakers if s not in held_out]
-    random.seed(args.seed)
-    random.shuffle(remaining)
+    # Destination directories
+    train_dir = out_dir / "train"
+    val_dir = out_dir / "validation"
+    test_unseen_dir = out_dir / "test_unseen"
 
-    n_val = max(1, int(len(remaining) * args.val_fraction)) if remaining else 0
-    val_speakers = set(remaining[:n_val])
-    train_speakers = set(remaining[n_val:])
+    # Clean existing destination dirs to guarantee fresh state
+    for d in (train_dir, val_dir, test_unseen_dir):
+        if d.exists():
+            shutil.rmtree(d)
+        d.mkdir(parents=True, exist_ok=True)
 
-    print(f"Speakers -- train: {sorted(train_speakers)}")
-    print(f"Speakers -- validation: {sorted(val_speakers)}")
-    print(f"Speakers -- testing (fully unseen): {sorted(held_out)}")
+    counts = {"train": {}, "validation": {}, "test_unseen": {}}
 
-    def speaker_split(speaker_id: str) -> str:
-        if speaker_id in held_out:
-            return "testing"
-        if speaker_id in val_speakers:
-            return "validation"
-        return "training"
+    # Populate train
+    for spk in train_set:
+        src_spk_dir = in_dir / spk
+        dest_spk_dir = train_dir / spk
+        dest_spk_dir.mkdir(parents=True, exist_ok=True)
+        wavs = list(src_spk_dir.glob("*.wav"))
+        for w in wavs:
+            link_or_copy(w, dest_spk_dir / w.name)
+        counts["train"][spk] = len(wavs)
 
-    n_copied = 0
-    for speaker_dir in in_dir.iterdir():
-        if not speaker_dir.is_dir():
-            continue
-        split = speaker_split(speaker_dir.name)
-        for word_dir in speaker_dir.iterdir():
-            if not word_dir.is_dir():
-                continue
-            label = word_dir.name
-            dest_dir = out_dir / split / label
-            dest_dir.mkdir(parents=True, exist_ok=True)
-            for wav in word_dir.glob("*.wav"):
-                dest = dest_dir / f"{speaker_dir.name}_{wav.name}"
-                if not dest.exists():
-                    shutil.copy(wav, dest)
-                    n_copied += 1
+    # Populate validation
+    for spk in val_set:
+        src_spk_dir = in_dir / spk
+        dest_spk_dir = val_dir / spk
+        dest_spk_dir.mkdir(parents=True, exist_ok=True)
+        wavs = list(src_spk_dir.glob("*.wav"))
+        for w in wavs:
+            link_or_copy(w, dest_spk_dir / w.name)
+        counts["validation"][spk] = len(wavs)
 
-    print(f"\nCopied {n_copied} files into {out_dir}")
-    for split in ("training", "validation", "testing"):
-        split_dir = out_dir / split
-        if split_dir.exists():
-            counts = {d.name: len(list(d.glob("*.wav"))) for d in split_dir.iterdir()}
-            print(f"  {split}: {counts}")
+    # Populate unseen test
+    for spk in held_out_set:
+        src_spk_dir = in_dir / spk
+        dest_spk_dir = test_unseen_dir / spk
+        dest_spk_dir.mkdir(parents=True, exist_ok=True)
+        wavs = list(src_spk_dir.glob("*.wav"))
+        for w in wavs:
+            link_or_copy(w, dest_spk_dir / w.name)
+        counts["test_unseen"][spk] = len(wavs)
+
+    # Summary table
+    print(f"{'Split':<15}{'Speakers':<30}{'Clips':<10}")
+    print("-" * 55)
+    total_split_clips = 0
+    for split_name, spk_dict in counts.items():
+        spk_list_str = ", ".join(f"{s} ({c})" for s, c in sorted(spk_dict.items()))
+        split_total = sum(spk_dict.values())
+        total_split_clips += split_total
+        print(f"{split_name:<15}{spk_list_str:<30}{split_total:<10}")
+    print("-" * 55)
+    print(f"Total Clips Split: {total_split_clips}")
+
+    # Guardrail 2: STRICT LEAKAGE AUDIT
+    print("\nAuditing for speaker data leakage...")
+    train_speakers_found = {d.name for d in train_dir.iterdir() if d.is_dir()}
+    val_speakers_found = {d.name for d in val_dir.iterdir() if d.is_dir()}
+    unseen_speakers_found = {d.name for d in test_unseen_dir.iterdir() if d.is_dir()}
+
+    for held_spk in held_out_set:
+        if held_spk in train_speakers_found:
+            msg = f"CRITICAL ERROR: Speaker {held_spk} found in training data! Phase 3 aborted to prevent data leakage."
+            print(msg, file=sys.stderr)
+            raise RuntimeError(msg)
+        if held_spk in val_speakers_found:
+            msg = f"CRITICAL ERROR: Speaker {held_spk} found in validation data! Phase 3 aborted to prevent data leakage."
+            print(msg, file=sys.stderr)
+            raise RuntimeError(msg)
+
+        # File-level scan for held-out keywords in filename or content
+        for f in train_dir.rglob("*.wav"):
+            if held_spk.lower() in f.name.lower() or held_spk.lower() in str(f).lower():
+                msg = f"CRITICAL ERROR: File from unseen speaker {held_spk} leaked into train: {f}!"
+                print(msg, file=sys.stderr)
+                raise RuntimeError(msg)
+
+        for f in val_dir.rglob("*.wav"):
+            if held_spk.lower() in f.name.lower() or held_spk.lower() in str(f).lower():
+                msg = f"CRITICAL ERROR: File from unseen speaker {held_spk} leaked into val: {f}!"
+                print(msg, file=sys.stderr)
+                raise RuntimeError(msg)
+
+    print("[SUCCESS] ZERO SPEAKER LEAKAGE VERIFIED. Held-out test speakers remain completely pristine.\n")
+    return counts
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Split normalized speakers into train, val, and unseen test.")
+    parser.add_argument("--in_dir", type=str, default="./data/normalized", help="Normalized audio root")
+    parser.add_argument("--out_dir", type=str, default="./data", help="Target root for train/val/test_unseen")
+    parser.add_argument("--train_speakers", nargs="+", default=["Ananya", "Ark", "Umang"],
+                        help="Speakers allocated to training")
+    parser.add_argument("--val_speakers", nargs="+", default=["Ishita"],
+                        help="Speakers allocated to validation")
+    parser.add_argument("--held_out_speakers", nargs="+", default=["Vitthal"],
+                        help="Speakers held out entirely as unseen test")
+    args = parser.parse_args()
+
+    split_speakers(
+        Path(args.in_dir),
+        Path(args.out_dir),
+        args.train_speakers,
+        args.val_speakers,
+        args.held_out_speakers,
+    )
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--in_dir", type=str, required=True)
-    parser.add_argument("--out_dir", type=str, required=True)
-    parser.add_argument("--held_out_speakers", nargs="+", default=[],
-                         help="Speaker IDs to exclude entirely from train/val, "
-                              "used only as the unseen-speaker test set")
-    parser.add_argument("--val_fraction", type=float, default=0.2,
-                         help="Fraction of the remaining (non-held-out) speakers "
-                              "to use for validation")
-    parser.add_argument("--seed", type=int, default=42)
-    args = parser.parse_args()
-    main(args)
+    main()

@@ -1,0 +1,127 @@
+{
+  "tflite_path": "phase3\\artifacts\\vaani_int8.tflite",
+  "model_size_kb": 13.390625,
+  "per_speaker": {
+    "Ananya": {
+      "status": "SEEN TRAIN",
+      "total": 39,
+      "correct": 26,
+      "accuracy": 66.66666666666666,
+      "mean_confidence": 0.6437548177364545
+    },
+    "Ark": {
+      "status": "SEEN TRAIN",
+      "total": 49,
+      "correct": 13,
+      "accuracy": 26.53061224489796,
+      "mean_confidence": 0.32566194327510134
+    },
+    "Ishita": {
+      "status": "VALIDATION",
+      "total": 42,
+      "correct": 35,
+      "accuracy": 83.33333333333334,
+      "mean_confidence": 0.7188294874060721
+    },
+    "Umang": {
+      "status": "SEEN TRAIN",
+      "total": 50,
+      "correct": 34,
+      "accuracy": 68.0,
+      "mean_confidence": 0.6093298518657684
+    },
+    "Vitthal": {
+      "status": "UNSEEN TEST",
+      "total": 26,
+      "correct": 22,
+      "accuracy": 84.61538461538461,
+      "mean_confidence": 0.7769536960583466
+    }
+  },
+  "mean_seen_accuracy": 53.73242630385487,
+  "mean_val_accuracy": 83.33333333333334,
+  "mean_unseen_accuracy": 84.61538461538461,
+  "generalization_gap": -30.88295831152974,
+  "true_positive_rate": 84.61538461538461,
+  "false_positive_rate": 0.5,
+  "false_negative_rate": 15.384615384615385,
+  "precision": 95.65217391304348,
+  "f1_score": 89.79591836734694,
+  "confusion_matrix": [
+    [
+      100,
+      0,
+      0
+    ],
+    [
+      0,
+      99,
+      1
+    ],
+    [
+      0,
+      4,
+      22
+    ]
+  ],
+  "threshold_sweep": [
+    {
+      "threshold": 0.2,
+      "tpr": 100.0,
+      "fpr": 2.5,
+      "precision": 83.87096774193549,
+      "f1": 91.2280701754386
+    },
+    {
+      "threshold": 0.3,
+      "tpr": 100.0,
+      "fpr": 2.0,
+      "precision": 86.66666666666667,
+      "f1": 92.85714285714286
+    },
+    {
+      "threshold": 0.4,
+      "tpr": 100.0,
+      "fpr": 1.0,
+      "precision": 92.85714285714286,
+      "f1": 96.2962962962963
+    },
+    {
+      "threshold": 0.5,
+      "tpr": 84.61538461538461,
+      "fpr": 0.5,
+      "precision": 95.65217391304348,
+      "f1": 89.79591836734694
+    },
+    {
+      "threshold": 0.6,
+      "tpr": 76.92307692307693,
+      "fpr": 0.0,
+      "precision": 100.0,
+      "f1": 86.95652173913044
+    },
+    {
+      "threshold": 0.7,
+      "tpr": 73.07692307692307,
+      "fpr": 0.0,
+      "precision": 100.0,
+      "f1": 84.44444444444444
+    },
+    {
+      "threshold": 0.8,
+      "tpr": 65.38461538461539,
+      "fpr": 0.0,
+      "precision": 100.0,
+      "f1": 79.06976744186048
+    },
+    {
+      "threshold": 0.9,
+      "tpr": 42.30769230769231,
+      "fpr": 0.0,
+      "precision": 100.0,
+      "f1": 59.45945945945945
+    }
+  ],
+  "verdict": "YES - STRONG GENERALIZATION",
+  "explanation": "The model achieved 84.6% accuracy on unseen speaker Vitthal with a modest generalization gap of -30.9 points. The model learned the acoustic signature of 'Vaani' rather than memorizing training voices."
+}

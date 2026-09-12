@@ -1,0 +1,34 @@
+{
+  "smoke_test": false,
+  "epochs_trained": 15,
+  "total_parameters": 4643,
+  "train_samples": 9513,
+  "val_samples": 242,
+  "test_samples": 226,
+  "final_train_acc": 0.9970566630363464,
+  "final_val_acc": 0.9297520518302917,
+  "test_acc": 0.982300877571106,
+  "test_loss": 0.04205593094229698,
+  "confusion_matrix": [
+    [
+      100,
+      0,
+      0
+    ],
+    [
+      0,
+      97,
+      3
+    ],
+    [
+      0,
+      1,
+      25
+    ]
+  ],
+  "labels": [
+    "silence",
+    "unknown",
+    "vaani"
+  ]
+}

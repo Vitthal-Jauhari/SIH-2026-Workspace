@@ -1,0 +1,265 @@
+{
+  "threshold": 0.4,
+  "clean_baseline_recall": 100.0,
+  "worst_condition": {
+    "noise_type": "traffic",
+    "snr_db": 0,
+    "unseen_vitthal_recall": 50.0,
+    "validation_ishita_recall": 59.5,
+    "unseen_mean_confidence": 44.3
+  },
+  "detailed_results": [
+    {
+      "noise_type": "fan",
+      "snr_db": 25,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 90.5,
+      "unseen_mean_confidence": 84.6
+    },
+    {
+      "noise_type": "fan",
+      "snr_db": 20,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 90.5,
+      "unseen_mean_confidence": 87.0
+    },
+    {
+      "noise_type": "fan",
+      "snr_db": 15,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 90.5,
+      "unseen_mean_confidence": 85.5
+    },
+    {
+      "noise_type": "fan",
+      "snr_db": 10,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 90.5,
+      "unseen_mean_confidence": 85.6
+    },
+    {
+      "noise_type": "fan",
+      "snr_db": 5,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 90.5,
+      "unseen_mean_confidence": 85.4
+    },
+    {
+      "noise_type": "fan",
+      "snr_db": 0,
+      "unseen_vitthal_recall": 96.2,
+      "validation_ishita_recall": 88.1,
+      "unseen_mean_confidence": 83.6
+    },
+    {
+      "noise_type": "keyboard_typing",
+      "snr_db": 25,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 100.0,
+      "unseen_mean_confidence": 97.0
+    },
+    {
+      "noise_type": "keyboard_typing",
+      "snr_db": 20,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 100.0,
+      "unseen_mean_confidence": 98.1
+    },
+    {
+      "noise_type": "keyboard_typing",
+      "snr_db": 15,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 100.0,
+      "unseen_mean_confidence": 98.8
+    },
+    {
+      "noise_type": "keyboard_typing",
+      "snr_db": 10,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 100.0,
+      "unseen_mean_confidence": 99.1
+    },
+    {
+      "noise_type": "keyboard_typing",
+      "snr_db": 5,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 100.0,
+      "unseen_mean_confidence": 99.4
+    },
+    {
+      "noise_type": "keyboard_typing",
+      "snr_db": 0,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 100.0,
+      "unseen_mean_confidence": 99.4
+    },
+    {
+      "noise_type": "ambient_room",
+      "snr_db": 25,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 100.0,
+      "unseen_mean_confidence": 95.0
+    },
+    {
+      "noise_type": "ambient_room",
+      "snr_db": 20,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 100.0,
+      "unseen_mean_confidence": 96.7
+    },
+    {
+      "noise_type": "ambient_room",
+      "snr_db": 15,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 100.0,
+      "unseen_mean_confidence": 96.8
+    },
+    {
+      "noise_type": "ambient_room",
+      "snr_db": 10,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 100.0,
+      "unseen_mean_confidence": 96.4
+    },
+    {
+      "noise_type": "ambient_room",
+      "snr_db": 5,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 100.0,
+      "unseen_mean_confidence": 95.5
+    },
+    {
+      "noise_type": "ambient_room",
+      "snr_db": 0,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 100.0,
+      "unseen_mean_confidence": 92.1
+    },
+    {
+      "noise_type": "traffic",
+      "snr_db": 25,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 92.9,
+      "unseen_mean_confidence": 89.0
+    },
+    {
+      "noise_type": "traffic",
+      "snr_db": 20,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 92.9,
+      "unseen_mean_confidence": 88.5
+    },
+    {
+      "noise_type": "traffic",
+      "snr_db": 15,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 90.5,
+      "unseen_mean_confidence": 84.9
+    },
+    {
+      "noise_type": "traffic",
+      "snr_db": 10,
+      "unseen_vitthal_recall": 92.3,
+      "validation_ishita_recall": 90.5,
+      "unseen_mean_confidence": 75.1
+    },
+    {
+      "noise_type": "traffic",
+      "snr_db": 5,
+      "unseen_vitthal_recall": 73.1,
+      "validation_ishita_recall": 83.3,
+      "unseen_mean_confidence": 62.4
+    },
+    {
+      "noise_type": "traffic",
+      "snr_db": 0,
+      "unseen_vitthal_recall": 50.0,
+      "validation_ishita_recall": 59.5,
+      "unseen_mean_confidence": 44.3
+    },
+    {
+      "noise_type": "speech_babble",
+      "snr_db": 25,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 100.0,
+      "unseen_mean_confidence": 97.5
+    },
+    {
+      "noise_type": "speech_babble",
+      "snr_db": 20,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 100.0,
+      "unseen_mean_confidence": 98.3
+    },
+    {
+      "noise_type": "speech_babble",
+      "snr_db": 15,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 100.0,
+      "unseen_mean_confidence": 98.9
+    },
+    {
+      "noise_type": "speech_babble",
+      "snr_db": 10,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 100.0,
+      "unseen_mean_confidence": 99.2
+    },
+    {
+      "noise_type": "speech_babble",
+      "snr_db": 5,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 100.0,
+      "unseen_mean_confidence": 99.4
+    },
+    {
+      "noise_type": "speech_babble",
+      "snr_db": 0,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 100.0,
+      "unseen_mean_confidence": 99.2
+    },
+    {
+      "noise_type": "pink_noise",
+      "snr_db": 25,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 97.6,
+      "unseen_mean_confidence": 93.5
+    },
+    {
+      "noise_type": "pink_noise",
+      "snr_db": 20,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 100.0,
+      "unseen_mean_confidence": 95.6
+    },
+    {
+      "noise_type": "pink_noise",
+      "snr_db": 15,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 100.0,
+      "unseen_mean_confidence": 97.6
+    },
+    {
+      "noise_type": "pink_noise",
+      "snr_db": 10,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 100.0,
+      "unseen_mean_confidence": 98.6
+    },
+    {
+      "noise_type": "pink_noise",
+      "snr_db": 5,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 100.0,
+      "unseen_mean_confidence": 99.0
+    },
+    {
+      "noise_type": "pink_noise",
+      "snr_db": 0,
+      "unseen_vitthal_recall": 100.0,
+      "validation_ishita_recall": 100.0,
+      "unseen_mean_confidence": 99.1
+    }
+  ]
+}

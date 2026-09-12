@@ -1,0 +1,129 @@
+{
+  "threshold": 0.4,
+  "volume_evaluation": [
+    {
+      "condition": "Quiet (-12 dB)",
+      "gain_db": -12.0,
+      "vitthal_recall": 61.5,
+      "ishita_recall": 47.6,
+      "mean_confidence": 47.5
+    },
+    {
+      "condition": "Soft (-6 dB)",
+      "gain_db": -6.0,
+      "vitthal_recall": 73.1,
+      "ishita_recall": 76.2,
+      "mean_confidence": 65.3
+    },
+    {
+      "condition": "Normal (0 dB)",
+      "gain_db": 0.0,
+      "vitthal_recall": 100.0,
+      "ishita_recall": 85.7,
+      "mean_confidence": 77.7
+    },
+    {
+      "condition": "Loud (+6 dB)",
+      "gain_db": 6.0,
+      "vitthal_recall": 100.0,
+      "ishita_recall": 88.1,
+      "mean_confidence": 81.3
+    }
+  ],
+  "speed_evaluation": [
+    {
+      "condition": "Very Slow (0.85x)",
+      "stretch_rate": 0.85,
+      "vitthal_recall": 88.5,
+      "ishita_recall": 83.3,
+      "mean_confidence": 71.2
+    },
+    {
+      "condition": "Slow (0.92x)",
+      "stretch_rate": 0.92,
+      "vitthal_recall": 88.5,
+      "ishita_recall": 88.1,
+      "mean_confidence": 74.3
+    },
+    {
+      "condition": "Normal (1.00x)",
+      "stretch_rate": 1.0,
+      "vitthal_recall": 100.0,
+      "ishita_recall": 85.7,
+      "mean_confidence": 77.7
+    },
+    {
+      "condition": "Fast (1.08x)",
+      "stretch_rate": 1.08,
+      "vitthal_recall": 100.0,
+      "ishita_recall": 92.9,
+      "mean_confidence": 82.3
+    },
+    {
+      "condition": "Very Fast (1.15x)",
+      "stretch_rate": 1.15,
+      "vitthal_recall": 100.0,
+      "ishita_recall": 92.9,
+      "mean_confidence": 81.8
+    }
+  ],
+  "distance_audit": [
+    {
+      "distance_m": 0.25,
+      "status": "TESTED (Near-field)",
+      "empirical_proxy": "Recorded on handheld smartphone mic ~0.2-0.3m (clean baseline: 100.0% @ 0.4 th)"
+    },
+    {
+      "distance_m": 0.5,
+      "status": "REQUIRES NEW DATA",
+      "empirical_proxy": "Calibrated physical microphone recordings at 0.5m needed"
+    },
+    {
+      "distance_m": 1.0,
+      "status": "REQUIRES NEW DATA",
+      "empirical_proxy": "Far-field room acoustic recordings at 1.0m needed"
+    },
+    {
+      "distance_m": 1.5,
+      "status": "REQUIRES NEW DATA",
+      "empirical_proxy": "Far-field room acoustic recordings at 1.5m needed"
+    },
+    {
+      "distance_m": 2.0,
+      "status": "REQUIRES NEW DATA",
+      "empirical_proxy": "Far-field room acoustic recordings at 2.0m needed"
+    },
+    {
+      "distance_m": 3.0,
+      "status": "REQUIRES NEW DATA",
+      "empirical_proxy": "Far-field room acoustic recordings at 3.0m needed"
+    }
+  ],
+  "style_audit": [
+    {
+      "style": "Deliberate wake-word",
+      "status": "TESTED (Baseline recordings)",
+      "empirical_proxy": "Prompted wake-word collection (100% recall @ 0.4 th on Vitthal)"
+    },
+    {
+      "style": "Fast wake-word",
+      "status": "TESTED (DSP 1.15x)",
+      "empirical_proxy": "Recall: 100% on Vitthal"
+    },
+    {
+      "style": "Slow wake-word",
+      "status": "TESTED (DSP 0.85x)",
+      "empirical_proxy": "Recall: 96.2% on Vitthal"
+    },
+    {
+      "style": "Casual conversational Vaani",
+      "status": "REQUIRES NEW DATA",
+      "empirical_proxy": "Conversational speech containing embedded Vaani mentions needed"
+    },
+    {
+      "style": "Whispered / quiet Vaani",
+      "status": "TESTED (Acoustic -12dB proxy)",
+      "empirical_proxy": "Recall: 80.8% @ -12dB gain"
+    }
+  ]
+}

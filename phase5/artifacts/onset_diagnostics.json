@@ -1,0 +1,32 @@
+{
+  "Ananya": {
+    "count": 39,
+    "mean_duration_sec": 2.293,
+    "mean_leading_silence_sec": 0.451,
+    "max_leading_silence_sec": 1.38
+  },
+  "Ark": {
+    "count": 49,
+    "mean_duration_sec": 4.554,
+    "mean_leading_silence_sec": 1.101,
+    "max_leading_silence_sec": 2.78
+  },
+  "Ishita": {
+    "count": 42,
+    "mean_duration_sec": 2.577,
+    "mean_leading_silence_sec": 0.534,
+    "max_leading_silence_sec": 1.65
+  },
+  "Umang": {
+    "count": 50,
+    "mean_duration_sec": 2.041,
+    "mean_leading_silence_sec": 0.777,
+    "max_leading_silence_sec": 1.37
+  },
+  "Vitthal": {
+    "count": 26,
+    "mean_duration_sec": 2.106,
+    "mean_leading_silence_sec": 0.62,
+    "max_leading_silence_sec": 1.17
+  }
+}

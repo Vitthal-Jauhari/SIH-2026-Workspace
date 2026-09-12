@@ -1,0 +1,218 @@
+{
+  "v1_path": "C:\\Users\\Asus\\OneDrive\\Documents\\SIH-2026\\Vaani\\phase3\\artifacts\\vaani_int8.tflite",
+  "v2_path": "C:\\Users\\Asus\\OneDrive\\Documents\\SIH-2026\\Vaani\\phase5\\artifacts\\vaani_v2_int8.tflite",
+  "seed": 42,
+  "clean_speaker_recall": {
+    "Ananya": {
+      "count": 39,
+      "v1_recall_th50": 66.7,
+      "v2_recall_th50": 89.7,
+      "v1_recall_th40": 69.2,
+      "v2_recall_th40": 92.3,
+      "v1_mean_conf": 0.643,
+      "v2_mean_conf": 0.88
+    },
+    "Ark": {
+      "count": 49,
+      "v1_recall_th50": 26.5,
+      "v2_recall_th50": 100.0,
+      "v1_recall_th40": 38.8,
+      "v2_recall_th40": 100.0,
+      "v1_mean_conf": 0.325,
+      "v2_mean_conf": 0.973
+    },
+    "Ishita": {
+      "count": 42,
+      "v1_recall_th50": 81.0,
+      "v2_recall_th50": 81.0,
+      "v1_recall_th40": 83.3,
+      "v2_recall_th40": 85.7,
+      "v1_mean_conf": 0.708,
+      "v2_mean_conf": 0.754
+    },
+    "Umang": {
+      "count": 50,
+      "v1_recall_th50": 66.0,
+      "v2_recall_th50": 96.0,
+      "v1_recall_th40": 72.0,
+      "v2_recall_th40": 98.0,
+      "v1_mean_conf": 0.593,
+      "v2_mean_conf": 0.944
+    },
+    "Vitthal": {
+      "count": 26,
+      "v1_recall_th50": 84.6,
+      "v2_recall_th50": 96.2,
+      "v1_recall_th40": 100.0,
+      "v2_recall_th40": 96.2,
+      "v1_mean_conf": 0.777,
+      "v2_mean_conf": 0.926
+    }
+  },
+  "quiet_speech_recall": {
+    "-12dB": {
+      "v1_recall": 61.5,
+      "v2_recall": 88.5
+    },
+    "-6dB": {
+      "v1_recall": 73.1,
+      "v2_recall": 96.2
+    },
+    "+0dB": {
+      "v1_recall": 100.0,
+      "v2_recall": 96.2
+    },
+    "+6dB": {
+      "v1_recall": 100.0,
+      "v2_recall": 100.0
+    }
+  },
+  "noise_robustness_recall": {
+    "traffic": {
+      "25dB": {
+        "v1_recall": 100.0,
+        "v2_recall": 100.0
+      },
+      "20dB": {
+        "v1_recall": 100.0,
+        "v2_recall": 100.0
+      },
+      "15dB": {
+        "v1_recall": 100.0,
+        "v2_recall": 100.0
+      },
+      "10dB": {
+        "v1_recall": 100.0,
+        "v2_recall": 100.0
+      },
+      "5dB": {
+        "v1_recall": 100.0,
+        "v2_recall": 100.0
+      },
+      "0dB": {
+        "v1_recall": 100.0,
+        "v2_recall": 100.0
+      }
+    },
+    "babble": {
+      "25dB": {
+        "v1_recall": 80.8,
+        "v2_recall": 73.1
+      },
+      "20dB": {
+        "v1_recall": 80.8,
+        "v2_recall": 76.9
+      },
+      "15dB": {
+        "v1_recall": 73.1,
+        "v2_recall": 73.1
+      },
+      "10dB": {
+        "v1_recall": 61.5,
+        "v2_recall": 69.2
+      },
+      "5dB": {
+        "v1_recall": 46.2,
+        "v2_recall": 57.7
+      },
+      "0dB": {
+        "v1_recall": 34.6,
+        "v2_recall": 53.8
+      }
+    },
+    "pink": {
+      "25dB": {
+        "v1_recall": 100.0,
+        "v2_recall": 100.0
+      },
+      "20dB": {
+        "v1_recall": 100.0,
+        "v2_recall": 100.0
+      },
+      "15dB": {
+        "v1_recall": 100.0,
+        "v2_recall": 100.0
+      },
+      "10dB": {
+        "v1_recall": 100.0,
+        "v2_recall": 100.0
+      },
+      "5dB": {
+        "v1_recall": 100.0,
+        "v2_recall": 100.0
+      },
+      "0dB": {
+        "v1_recall": 100.0,
+        "v2_recall": 100.0
+      }
+    }
+  },
+  "speed_robustness_recall": {
+    "0.85x": {
+      "v1_recall": 88.5,
+      "v2_recall": 88.5
+    },
+    "0.92x": {
+      "v1_recall": 88.5,
+      "v2_recall": 96.2
+    },
+    "1.00x": {
+      "v1_recall": 100.0,
+      "v2_recall": 96.2
+    },
+    "1.08x": {
+      "v1_recall": 100.0,
+      "v2_recall": 100.0
+    },
+    "1.15x": {
+      "v1_recall": 100.0,
+      "v2_recall": 96.2
+    }
+  },
+  "test_set_summary": {
+    "V1_th40": {
+      "threshold": 0.4,
+      "TP": 26,
+      "FP": 7,
+      "TN": 193,
+      "FN": 0,
+      "precision": 78.79,
+      "recall": 100.0,
+      "f1": 88.14,
+      "fpr": 3.5
+    },
+    "V2_th40": {
+      "threshold": 0.4,
+      "TP": 25,
+      "FP": 4,
+      "TN": 196,
+      "FN": 1,
+      "precision": 86.21,
+      "recall": 96.15,
+      "f1": 90.91,
+      "fpr": 2.0
+    },
+    "V1_th50": {
+      "threshold": 0.5,
+      "TP": 22,
+      "FP": 4,
+      "TN": 196,
+      "FN": 4,
+      "precision": 84.62,
+      "recall": 84.62,
+      "f1": 84.62,
+      "fpr": 2.0
+    },
+    "V2_th50": {
+      "threshold": 0.5,
+      "TP": 25,
+      "FP": 3,
+      "TN": 197,
+      "FN": 1,
+      "precision": 89.29,
+      "recall": 96.15,
+      "f1": 92.59,
+      "fpr": 1.5
+    }
+  }
+}
