@@ -1,0 +1,31 @@
+{
+  "model_file": "vaani_int8.tflite",
+  "model_size_bytes": 13712,
+  "model_size_kb": 13.39,
+  "budget_limit_kb": 256.0,
+  "budget_headroom_kb": 242.61,
+  "input_shape": [
+    1,
+    63,
+    13,
+    1
+  ],
+  "input_dtype": "<class 'numpy.int8'>",
+  "output_shape": [
+    1,
+    3
+  ],
+  "output_dtype": "<class 'numpy.int8'>",
+  "tflite_micro_tensor_arena_bytes": 26712,
+  "tflite_micro_tensor_arena_kb": 26.09,
+  "audio_pcm_rolling_buffer_kb": 31.25,
+  "espdsp_mfcc_buffer_kb": 8.0,
+  "total_ram_footprint_kb": 65.34,
+  "host_pc_latency_ms": 0.1,
+  "projected_esp32s3_latency": "12 - 18 ms (projected via ESP-NN vector extensions)",
+  "projected_esp32_classic_latency": "35 - 55 ms (projected standard Xtensa LX6)",
+  "esp32_sram_utilization_pct": 20.4,
+  "esp32s3_sram_utilization_pct": 12.8,
+  "flash_utilization_4mb_pct": 0.33,
+  "deployment_status": "READY FOR DEPLOYMENT TEST (REQUIRES PHYSICAL HARDWARE FLASH)"
+}

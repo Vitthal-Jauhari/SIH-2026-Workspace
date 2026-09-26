@@ -1,0 +1,28 @@
+{
+  "smoke_test": false,
+  "epochs_trained": 26,
+  "train_samples": 2745,
+  "val_samples": 242,
+  "test_samples": 381,
+  "final_train_acc": 0.9952641129493713,
+  "final_val_acc": 0.9008264541625977,
+  "test_acc": 0.9028871655464172,
+  "test_loss": 0.1862645149230957,
+  "confusion_matrix": [
+    [
+      127,
+      0,
+      0
+    ],
+    [
+      0,
+      124,
+      3
+    ],
+    [
+      0,
+      34,
+      93
+    ]
+  ]
+}

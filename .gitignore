@@ -1,3 +1,45 @@
+# Python & caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Datasets & audio files (downloaded locally via data_prep.py)
+data/
+**/data/
+*.tar.gz
+*.zip
+*.tar
+*.wav
+
+# Model checkpoints (keep the tiny ~13KB .tflite, ignore heavy ~140KB .keras if desired)
+*.keras
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+
+# Testing & build artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+*.log
 dataset/
 datasets/
 

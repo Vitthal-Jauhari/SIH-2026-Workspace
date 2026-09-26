@@ -1,0 +1,47 @@
+{
+  "model_path": "phase3/artifacts/vaani_int8.tflite",
+  "model_filename": "vaani_int8.tflite",
+  "sha256": "2c05085e251a800f8176fdb33b3ed4d812782dd10305788ddcffe0132d59d88e",
+  "size_bytes": 13712,
+  "size_kb": 13.39,
+  "input_tensor": {
+    "name": "serving_default_input_layer:0",
+    "shape": [
+      1,
+      63,
+      13,
+      1
+    ],
+    "dtype": "<class 'numpy.int8'>",
+    "quantization": {
+      "scale": 3.065234899520874,
+      "zero_point": 68
+    }
+  },
+  "output_tensor": {
+    "name": "StatefulPartitionedCall_1:0",
+    "shape": [
+      1,
+      3
+    ],
+    "dtype": "<class 'numpy.int8'>",
+    "quantization": {
+      "scale": 0.00390625,
+      "zero_point": -128
+    }
+  },
+  "labels": [
+    "silence",
+    "unknown",
+    "vaani"
+  ],
+  "phase3_metrics": {
+    "seen_mean_accuracy": 53.73242630385487,
+    "val_accuracy": 83.33333333333334,
+    "unseen_vitthal_accuracy": 84.61538461538461,
+    "generalization_gap": -30.88295831152974,
+    "false_positive_rate": 0.5,
+    "true_positive_rate": 84.61538461538461,
+    "model_size_kb": 13.390625
+  }
+}

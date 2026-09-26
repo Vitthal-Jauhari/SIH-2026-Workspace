@@ -1,0 +1,134 @@
+{
+  "tflite_path": "phase3/artifacts/vaani_int8.tflite",
+  "model_size_kb": 13.375,
+  "per_speaker": {
+    "Ananya": {
+      "status": "SEEN TRAIN",
+      "total": 39,
+      "correct": 23,
+      "accuracy": 58.97435897435898,
+      "mean_confidence": 0.598596824428592
+    },
+    "Ark": {
+      "status": "SEEN TRAIN",
+      "total": 46,
+      "correct": 4,
+      "accuracy": 8.695652173913043,
+      "mean_confidence": 0.1665488730346703
+    },
+    "Ishita": {
+      "status": "VALIDATION",
+      "total": 42,
+      "correct": 21,
+      "accuracy": 50.0,
+      "mean_confidence": 0.524672859104439
+    },
+    "Mayank": {
+      "status": "SEEN TRAIN",
+      "total": 48,
+      "correct": 10,
+      "accuracy": 20.833333333333336,
+      "mean_confidence": 0.2953925855302562
+    },
+    "Umang": {
+      "status": "SEEN TRAIN",
+      "total": 50,
+      "correct": 28,
+      "accuracy": 56.00000000000001,
+      "mean_confidence": 0.5538681570999324
+    },
+    "Vitthal": {
+      "status": "UNSEEN TEST",
+      "total": 127,
+      "correct": 90,
+      "accuracy": 70.86614173228347,
+      "mean_confidence": 0.6744735689217768
+    }
+  },
+  "mean_seen_accuracy": 36.12583612040134,
+  "mean_val_accuracy": 50.0,
+  "mean_unseen_accuracy": 70.86614173228347,
+  "generalization_gap": -34.74030561188213,
+  "true_positive_rate": 70.86614173228347,
+  "false_positive_rate": 1.1811023622047243,
+  "false_negative_rate": 29.133858267716533,
+  "precision": 96.7741935483871,
+  "f1_score": 81.81818181818183,
+  "confusion_matrix": [
+    [
+      127,
+      0,
+      0
+    ],
+    [
+      0,
+      124,
+      3
+    ],
+    [
+      0,
+      37,
+      90
+    ]
+  ],
+  "threshold_sweep": [
+    {
+      "threshold": 0.2,
+      "tpr": 95.2755905511811,
+      "fpr": 1.1811023622047243,
+      "precision": 97.58064516129032,
+      "f1": 96.41434262948206
+    },
+    {
+      "threshold": 0.3,
+      "tpr": 88.18897637795276,
+      "fpr": 1.1811023622047243,
+      "precision": 97.3913043478261,
+      "f1": 92.56198347107438
+    },
+    {
+      "threshold": 0.4,
+      "tpr": 83.46456692913385,
+      "fpr": 1.1811023622047243,
+      "precision": 97.24770642201835,
+      "f1": 89.83050847457628
+    },
+    {
+      "threshold": 0.5,
+      "tpr": 70.86614173228347,
+      "fpr": 1.1811023622047243,
+      "precision": 96.7741935483871,
+      "f1": 81.81818181818183
+    },
+    {
+      "threshold": 0.6,
+      "tpr": 63.77952755905512,
+      "fpr": 0.7874015748031495,
+      "precision": 97.59036144578313,
+      "f1": 77.14285714285714
+    },
+    {
+      "threshold": 0.7,
+      "tpr": 53.54330708661418,
+      "fpr": 0.39370078740157477,
+      "precision": 98.55072463768117,
+      "f1": 69.38775510204083
+    },
+    {
+      "threshold": 0.8,
+      "tpr": 40.94488188976378,
+      "fpr": 0.39370078740157477,
+      "precision": 98.11320754716981,
+      "f1": 57.77777777777777
+    },
+    {
+      "threshold": 0.9,
+      "tpr": 27.559055118110237,
+      "fpr": 0.0,
+      "precision": 100.0,
+      "f1": 43.20987654320988
+    }
+  ],
+  "verdict": "PARTIAL GENERALIZATION",
+  "explanation": "The model recognizes unseen speaker Vitthal with 70.9% accuracy, with a generalization gap of -34.7 points."
+}
