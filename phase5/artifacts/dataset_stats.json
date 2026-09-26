@@ -1,9 +1,9 @@
 {
   "training": {
-    "vaani": 3171,
-    "unknown": 3171,
-    "silence": 3171,
-    "total": 9513
+    "vaani": 4275,
+    "unknown": 4275,
+    "silence": 4275,
+    "total": 12825
   },
   "validation": {
     "vaani": 42,
@@ -12,11 +12,11 @@
     "total": 242
   },
   "testing": {
-    "vaani": 26,
-    "unknown": 100,
-    "silence": 100,
-    "total": 226
+    "vaani": 127,
+    "unknown": 381,
+    "silence": 381,
+    "total": 889
   },
-  "total_samples": 9981,
+  "total_samples": 13956,
   "verified_zero_leakage": true
 }

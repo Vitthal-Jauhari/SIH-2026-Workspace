@@ -130,14 +130,15 @@ def train_model(
     callbacks = [
         tf.keras.callbacks.ModelCheckpoint(
             str(out_dir / "best_model.keras"),
-            monitor="val_accuracy",
+            monitor="val_loss",
             save_best_only=True,
-            mode="max",
+            mode="min",
         ),
         tf.keras.callbacks.EarlyStopping(
-            monitor="val_accuracy",
-            patience=8,
+            monitor="val_loss",
+            patience=10,
             restore_best_weights=True,
+            mode="min",
         ),
         tf.keras.callbacks.ReduceLROnPlateau(
             monitor="val_loss",

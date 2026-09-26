@@ -9,18 +9,18 @@
     "total_targets": 15,
     "detected_targets": 15,
     "recall": 100.0,
-    "false_triggers": 626,
-    "false_triggers_per_hour": 3756.0,
-    "mean_latency_ms": 379.4,
-    "total_detections": 663
+    "false_triggers": 387,
+    "false_triggers_per_hour": 2322.0,
+    "mean_latency_ms": 413.5,
+    "total_detections": 419
   },
   "v2": {
     "total_targets": 15,
     "detected_targets": 15,
     "recall": 100.0,
-    "false_triggers": 565,
-    "false_triggers_per_hour": 3390.0,
-    "mean_latency_ms": 289.3,
-    "total_detections": 604
+    "false_triggers": 300,
+    "false_triggers_per_hour": 1800.0,
+    "mean_latency_ms": 537.3,
+    "total_detections": 328
   }
 }

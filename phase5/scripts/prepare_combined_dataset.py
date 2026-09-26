@@ -144,16 +144,26 @@ def build_combined_dataset(
 
     print(f"Positive Vaani counts: Train={n_train_vaani}, Val={n_val_vaani}, Test={n_test_vaani}")
 
-    # 2. Ingest Hard Negatives (if any exist in data/normalized/hard_negatives)
+    # 2. Ingest Hard Negatives (speaker-aware split preserving zero-leakage)
     hard_neg_dir = data_dir / "normalized" / "hard_negatives"
-    hard_neg_files = []
-    if hard_neg_dir.exists():
-        for cat_dir in hard_neg_dir.iterdir():
-            if cat_dir.is_dir():
-                hard_neg_files.extend(list(cat_dir.glob("*.wav")))
+    train_hard_negs = []
+    val_hard_negs = []
+    test_hard_negs = []
 
-    n_hard_neg = len(hard_neg_files)
-    print(f"Discovered {n_hard_neg} hard negative files.")
+    if hard_neg_dir.exists():
+        for spk_or_cat in hard_neg_dir.iterdir():
+            if not spk_or_cat.is_dir():
+                continue
+            cat_name = spk_or_cat.name
+            files = list(spk_or_cat.glob("*.wav"))
+            if any(h.lower() in cat_name.lower() for h in held_out_set):
+                test_hard_negs.extend(files)
+            elif any(v.lower() in cat_name.lower() or (v.lower().startswith("ishi") and cat_name.lower().startswith("ishi")) for v in val_set):
+                val_hard_negs.extend(files)
+            else:
+                train_hard_negs.extend(files)
+
+    print(f"Hard negatives partitioned: Train={len(train_hard_negs)}, Val={len(val_hard_negs)}, Unseen Test={len(test_hard_negs)}")
 
     # 3. Ingest Speech Commands Negatives (unknown class)
     sc_words = [d for d in sc_dir.iterdir() if d.is_dir() and not d.name.startswith(("_", "."))]
@@ -164,40 +174,53 @@ def build_combined_dataset(
     print(f"Speech Commands available clips: {len(all_sc_pool)} across {len(sc_words)} words")
 
     # Target class balance
-    # Train: balanced with positive Vaani count (~1000 - 2000)
+    # Train: balanced with positive Vaani count
     n_train_neg = n_train_vaani
     n_val_neg = max(100, n_val_vaani * 2)
     n_test_neg = max(100, n_test_vaani * 3)
 
-    # Ingest hard negatives into training unknown first
-    idx = 0
-    for hn in hard_neg_files:
+    # 3a. Ingest train hard negatives + fill with Speech Commands
+    train_idx = 0
+    for hn in train_hard_negs:
         dest = combined_dir / "training" / "unknown" / f"hardneg_{hn.parent.name}_{hn.name}"
         link_or_copy(hn, dest)
-        idx += 1
+        train_idx += 1
 
-    # Fill remainder of training unknown with Speech Commands
     sc_idx = 0
-    while idx < n_train_neg:
+    while train_idx < n_train_neg:
         w = all_sc_pool[sc_idx % len(all_sc_pool)]
         sc_idx += 1
-        dest = combined_dir / "training" / "unknown" / f"sc_train_{idx:05d}_{w.parent.name}_{w.name}"
+        dest = combined_dir / "training" / "unknown" / f"sc_train_{train_idx:05d}_{w.parent.name}_{w.name}"
         link_or_copy(w, dest)
-        idx += 1
+        train_idx += 1
 
-    # Validation unknown
-    for v_i in range(n_val_neg):
-        w = all_sc_pool[sc_idx % len(all_sc_pool)]
-        sc_idx += 1
-        dest = combined_dir / "validation" / "unknown" / f"sc_val_{v_i:05d}_{w.parent.name}_{w.name}"
-        link_or_copy(w, dest)
+    # 3b. Ingest validation hard negatives + fill with Speech Commands
+    val_idx = 0
+    for hn in val_hard_negs:
+        dest = combined_dir / "validation" / "unknown" / f"hardneg_{hn.parent.name}_{hn.name}"
+        link_or_copy(hn, dest)
+        val_idx += 1
 
-    # Testing unknown
-    for t_i in range(n_test_neg):
+    while val_idx < n_val_neg:
         w = all_sc_pool[sc_idx % len(all_sc_pool)]
         sc_idx += 1
-        dest = combined_dir / "testing" / "unknown" / f"sc_test_{t_i:05d}_{w.parent.name}_{w.name}"
+        dest = combined_dir / "validation" / "unknown" / f"sc_val_{val_idx:05d}_{w.parent.name}_{w.name}"
         link_or_copy(w, dest)
+        val_idx += 1
+
+    # 3c. Ingest test unseen hard negatives + fill with Speech Commands
+    test_idx = 0
+    for hn in test_hard_negs:
+        dest = combined_dir / "testing" / "unknown" / f"hardneg_{hn.parent.name}_{hn.name}"
+        link_or_copy(hn, dest)
+        test_idx += 1
+
+    while test_idx < n_test_neg:
+        w = all_sc_pool[sc_idx % len(all_sc_pool)]
+        sc_idx += 1
+        dest = combined_dir / "testing" / "unknown" / f"sc_test_{test_idx:05d}_{w.parent.name}_{w.name}"
+        link_or_copy(w, dest)
+        test_idx += 1
 
     # 4. Generate Calibrated Ambient Silence
     generate_silence_clips(combined_dir / "training" / "silence", n_train_neg, "train")

@@ -7,14 +7,14 @@ Evaluates whether the tiny ESP32 wake-word model recognizes **"Vaani"** from a g
 - **Model Size Ceiling**: 256.0 KB (Achieved: **13.39 KB INT8**)
 - **Phonetic Target**: "Vaani" (Positive class)
 - **Negative Classes**: `unknown` (Google Speech Commands non-target words) + `silence` (ambient room noise)
-- **Speakers**: Ananya, Ark, Ishita, Umang, Vitthal (206 total recordings)
+- **Speakers**: Ananya, Ark, Ishita, Mayank, Umang, Vitthal (352 total recordings)
 
 ---
 
 ## The Speaker Generalization Setup
-- **Train (Seen)**: Ananya, Ark, Umang (138 clips → augmented to 690 clips)
+- **Train (Seen)**: Ananya, Ark, Umang, Mayank (183 clean clips → augmented to ~915 clips)
 - **Validation**: Ishita (42 clean clips)
-- **Unseen Test**: Vitthal (26 clean clips — completely held out)
+- **Unseen Test**: Vitthal (127 clean clips — completely held out)
 
 ---
 
@@ -30,17 +30,17 @@ python run_pipeline.py --epochs 35
 ## Step-by-Step Pipeline
 
 ### 1. Audio Normalization
-Converts all 206 raw recordings (M4A, MP3, AAC, and unusual extensions like `.10`, `.15`, `.2`) into standard 16 kHz mono 16-bit PCM WAVs:
+Converts all 352 raw recordings (M4A, MP3, AAC, and unusual extensions like `.10`, `.15`, `.2`) into standard 16 kHz mono 16-bit PCM WAVs:
 ```bash
-python normalize_audio.py --in_dir ./Audio --out_dir ./data/normalized --expected_count 206
+python normalize_audio.py --in_dir ./Audio --out_dir ./data/normalized --expected_count 352
 ```
-*(Automated guardrail: aborts immediately if normalized files != 206)*.
+*(Automated guardrail: aborts immediately if normalized files != 352)*.
 
 ### 2. Speaker-Level Split (Strictly Before Augmentation)
 Partitions clean normalized audio by speaker to guarantee zero speaker leakage:
 ```bash
 python speaker_split.py --in_dir ./data/normalized --out_dir ./data \
-    --train_speakers Ananya Ark Umang \
+    --train_speakers Ananya Ark Umang Mayank \
     --val_speakers Ishita \
     --held_out_speakers Vitthal
 ```
@@ -83,13 +83,3 @@ python eval_by_speaker.py --tflite_path ./artifacts/vaani_int8.tflite \
     --data_dir ./data --combined_dir ./data/combined --out_dir ./artifacts \
     --held_out_speakers Vitthal --val_speakers Ishita
 ```
-
----
-
-## Key Results
-- **Unseen Speaker Accuracy (Vitthal)**: **84.6%** (22/26) at 0.5 threshold, **100.0%** (26/26) at 0.4 threshold
-- **Validation Speaker Accuracy (Ishita)**: **83.3%** (35/42)
-- **False Positive Rate**: **0.5%** (1 false trigger in 200 non-wake-word test clips)
-- **Silence Rejection**: **100.0%** (100/100 correct)
-- **INT8 Model Size**: **13.39 KB** (< 256 KB budget, 242.6 KB headroom)
-- **Mean Inference Latency**: **0.12 ms**

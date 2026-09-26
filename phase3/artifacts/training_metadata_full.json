@@ -1,28 +1,28 @@
 {
   "smoke_test": false,
-  "epochs_trained": 35,
-  "train_samples": 2090,
+  "epochs_trained": 26,
+  "train_samples": 2745,
   "val_samples": 242,
-  "test_samples": 226,
-  "final_train_acc": 0.9904305934906006,
-  "final_val_acc": 0.9545454382896423,
-  "test_acc": 0.9778761267662048,
-  "test_loss": 0.056226473301649094,
+  "test_samples": 381,
+  "final_train_acc": 0.9952641129493713,
+  "final_val_acc": 0.9008264541625977,
+  "test_acc": 0.9028871655464172,
+  "test_loss": 0.1862645149230957,
   "confusion_matrix": [
     [
-      100,
+      127,
       0,
       0
     ],
     [
       0,
-      99,
-      1
+      124,
+      3
     ],
     [
       0,
-      4,
-      22
+      34,
+      93
     ]
   ]
 }

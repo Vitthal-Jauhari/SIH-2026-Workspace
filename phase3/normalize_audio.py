@@ -192,13 +192,18 @@ def normalize_dataset(in_dir: Path, out_dir: Path, expected_count: int = 206):
         msg = f"ERROR: Expected {expected_count} normalized files, but converted {total_converted} (on disk: {actual_on_disk})!"
         print(msg, file=sys.stderr)
         raise RuntimeError(msg)
+    elif expected_count is None and (total_converted != total_found or actual_on_disk != total_found):
+        msg = f"ERROR: Converted {total_converted}/{total_found} discovered files (on disk: {actual_on_disk})!"
+        print(msg, file=sys.stderr)
+        raise RuntimeError(msg)
 
     if total_failed > 0:
         msg = f"ERROR: Normalization failed on {total_failed} files!"
         print(msg, file=sys.stderr)
         raise RuntimeError(msg)
 
-    print(f"[SUCCESS] All {actual_on_disk} files verified on disk ({expected_count}/{expected_count}) in {out_dir}\n")
+    verif_target = expected_count if expected_count is not None else total_found
+    print(f"[SUCCESS] All {actual_on_disk} files verified on disk ({actual_on_disk}/{verif_target}) in {out_dir}\n")
     return per_speaker_stats
 
 
@@ -206,7 +211,7 @@ def main():
     parser = argparse.ArgumentParser(description="Standardize all Vaani recordings to 16kHz mono PCM WAV.")
     parser.add_argument("--in_dir", type=str, default="./Audio", help="Path to raw Audio/ directory")
     parser.add_argument("--out_dir", type=str, default="./data/normalized", help="Path to save normalized WAVs")
-    parser.add_argument("--expected_count", type=int, default=206, help="Expected number of recordings (default: 206)")
+    parser.add_argument("--expected_count", type=int, default=352, help="Expected number of recordings (default: 352)")
     args = parser.parse_args()
 
     normalize_dataset(Path(args.in_dir), Path(args.out_dir), args.expected_count)

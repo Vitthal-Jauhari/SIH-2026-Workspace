@@ -140,7 +140,7 @@ def normalize_directory(
     """
     out_dir.mkdir(parents=True, exist_ok=True)
     count = 0
-    extensions = {".wav", ".mp3", ".m4a", ".aac", ".flac", ".ogg", ".10", ".15", ".2"}
+    extensions = {".wav", ".mp3", ".m4a", ".ma4", ".aac", ".flac", ".ogg", ".10", ".15", ".2"}
 
     for p in sorted(in_dir.rglob("*")):
         if not p.is_file():

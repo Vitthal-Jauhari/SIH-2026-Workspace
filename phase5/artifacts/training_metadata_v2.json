@@ -1,29 +1,29 @@
 {
   "smoke_test": false,
-  "epochs_trained": 15,
+  "epochs_trained": 26,
   "total_parameters": 4643,
-  "train_samples": 9513,
+  "train_samples": 12825,
   "val_samples": 242,
-  "test_samples": 226,
-  "final_train_acc": 0.9970566630363464,
-  "final_val_acc": 0.9297520518302917,
-  "test_acc": 0.982300877571106,
-  "test_loss": 0.04205593094229698,
+  "test_samples": 889,
+  "final_train_acc": 0.998206615447998,
+  "final_val_acc": 0.7479338645935059,
+  "test_acc": 0.953880786895752,
+  "test_loss": 0.18120889365673065,
   "confusion_matrix": [
     [
-      100,
+      381,
       0,
       0
     ],
     [
       0,
-      97,
-      3
+      349,
+      32
     ],
     [
       0,
-      1,
-      25
+      9,
+      118
     ]
   ],
   "labels": [

@@ -23,7 +23,7 @@ All while strictly maintaining model size below the hard **256 KB** budget and p
 ## 2. V1 Baseline
 
 The Phase 3 INT8 model is treated as the immutable V1 baseline:
-- **Path:** [`phase3/artifacts/vaani_int8.tflite`](file:///c:/Users/Asus/OneDrive/Documents/SIH-2026/Vaani/phase3/artifacts/vaani_int8.tflite)
+- **Path:** `phase3/artifacts/vaani_int8.tflite`
 - **SHA256:** `2c05085e251a800f8176fdb33b3ed4d812782dd10305788ddcffe0132d59d88e`
 - **File Size:** 13,712 bytes (13.39 KB)
 - **Input Tensor:** `(1, 63, 13, 1)` INT8

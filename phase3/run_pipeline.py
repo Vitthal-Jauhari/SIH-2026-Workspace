@@ -3,8 +3,8 @@ Phase 3 - End-to-End Orchestrator
 
 Runs the complete Phase 3 pipeline in the exact required sequence:
 1. Normalize audio (M4A, MP3, AAC, unusual extensions -> 16kHz mono PCM WAV)
-   [Guardrail: asserts exactly 206 files normalized]
-2. Split speakers BEFORE augmentation (Train: Ananya, Ark, Umang | Val: Ishita | Unseen: Vitthal)
+   [Guardrail: asserts exactly 352 files normalized]
+2. Split speakers BEFORE augmentation (Train: Ananya, Ark, Umang, Mayank | Val: Ishita | Unseen: Vitthal)
    [Guardrail: asserts zero speaker leakage]
 3. Augment TRAINING speakers only (Validation & Unseen strictly untouched)
 4. Merge Vaani + Phase 1 Speech Commands negative data (3-class balance)
@@ -54,14 +54,14 @@ def main():
     # Step 1: Normalize
     run_cmd(
         [python_exe, str(norm_script), "--in_dir", str(phase3_dir / "Audio"),
-         "--out_dir", str(phase3_dir / "data" / "normalized"), "--expected_count", "206"],
-        "Step 1: Audio Normalization (Assert 206/206 files)",
+         "--out_dir", str(phase3_dir / "data" / "normalized"), "--expected_count", "352"],
+        "Step 1: Audio Normalization (Assert 352/352 files)",
     )
 
     # Step 2: Speaker Split
     run_cmd(
         [python_exe, str(split_script), "--in_dir", str(phase3_dir / "data" / "normalized"),
-         "--out_dir", str(phase3_dir / "data"), "--train_speakers", "Ananya", "Ark", "Umang",
+         "--out_dir", str(phase3_dir / "data"), "--train_speakers", "Ananya", "Ark", "Umang", "Mayank",
          "--val_speakers", "Ishita", "--held_out_speakers", "Vitthal"],
         "Step 2: Speaker Split & Zero-Leakage Audit",
     )

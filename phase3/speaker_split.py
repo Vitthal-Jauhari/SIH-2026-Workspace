@@ -82,6 +82,12 @@ def split_speakers(
         print(msg, file=sys.stderr)
         raise RuntimeError(msg)
 
+    # Assign any newly discovered speakers not explicitly listed to train by default
+    unassigned = available_speakers - (train_set | val_set | held_out_set)
+    if unassigned:
+        print(f"Assigning new unassigned speakers to Train split: {sorted(unassigned)}")
+        train_set.update(unassigned)
+
     # Destination directories
     train_dir = out_dir / "train"
     val_dir = out_dir / "validation"
@@ -174,7 +180,7 @@ def main():
     parser = argparse.ArgumentParser(description="Split normalized speakers into train, val, and unseen test.")
     parser.add_argument("--in_dir", type=str, default="./data/normalized", help="Normalized audio root")
     parser.add_argument("--out_dir", type=str, default="./data", help="Target root for train/val/test_unseen")
-    parser.add_argument("--train_speakers", nargs="+", default=["Ananya", "Ark", "Umang"],
+    parser.add_argument("--train_speakers", nargs="+", default=["Ananya", "Ark", "Umang", "Mayank"],
                         help="Speakers allocated to training")
     parser.add_argument("--val_speakers", nargs="+", default=["Ishita"],
                         help="Speakers allocated to validation")

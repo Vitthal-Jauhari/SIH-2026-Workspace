@@ -1,103 +1,95 @@
 # Vaani — Edge Wake-Word Detection Pipeline
 
-An end-to-end keyword spotting (KWS) pipeline designed for ultra-low-power microcontrollers (e.g. ESP32-S3) with an INT8 model size under 256 KB (~13.7 KB).
+An end-to-end Keyword Spotting (KWS) pipeline designed for ultra-low-power microcontrollers (e.g. ESP32 / ESP32-S3) with an INT8 model size under 256 KB (~13.4 KB) and ultra-low inference latency (~14.5 ms on ESP32-S3, ~0.12 ms on PC).
 
 ---
 
-## Project Structure
-
-This repository is structured into three self-contained development phases:
+## Repository Structure
 
 ```text
 vaani/
-├── phase1/    # Prototype, DS-CNN Model, Training & INT8 Quantization
-├── phase2/    # PC-Side Validation (Offline WAV Evaluation & Live Mic Stream)
-├── phase3/    # Real Speaker Diversity, Audio Augmentation & Holdout Evaluation
-└── .gitignore # Filters out local data downloads & temporary caches
+├── esp32_deployment/     # Microcontroller deployment package (.ino sketch, C headers, wiring guide)
+├── export_model_to_c.py   # Packager script converting .tflite to C headers (model_data.h, model_config.h)
+├── test_live_mic.py       # Real-time PC microphone wake-word & near-miss testing suite
+├── phase1/                # Prototype, DS-CNN architecture, initial training & INT8 quantization
+├── phase2/                # PC-side validation (offline WAV evaluation & live mic stream)
+├── phase3/                # Real speaker diversity (352 recordings across 5 speakers), augmentation & zero-leakage split
+├── phase4/                # Robustness benchmarking (continuous sliding window, noise injection, threshold sweep, ESP32 profiler)
+├── phase5/                # Hard negative mining, Model V2 (dual-target optimization, 100% unseen test recall, 100% 'Paani' rejection)
+└── .gitignore             # Ignores large raw audio datasets, virtualenvs, IDE caches, and temporary files
 ```
 
 ---
 
-## End-to-End Walkthrough (When Your Dataset Arrives)
+## Quick Start: Testing & Deployment
 
-### 1. Phase 1: Setup & Train the Wake-Word Model
+### 1. Test Live on PC Microphone
+
+Experience real-time wake-word detection and near-miss rejection ("Paani", "Rani", conversational speech):
 
 ```bash
-cd phase1
-pip install -r requirements.txt
+# Run Model V2 (default)
+python test_live_mic.py
 
-# Step A: Download Speech Commands v0.02 to generate negative classes ("unknown" & "silence")
-python data_prep.py --data_dir ./data
+# Compare against Model V1 (Phase 3 baseline)
+python test_live_mic.py --model v1
 
-# Step B: Drop your Vaani recordings into phase1/data/vaani_raw organized by speaker:
-# data/vaani_raw/
-# ├── speaker_01/ (*.wav)
-# ├── speaker_02/ (*.wav)
-# └── speaker_03/ (*.wav)
+# List available input devices
+python test_live_mic.py --list-devices
+```
 
-# Step C: Ingest Vaani recordings, hold out test speakers, and merge with negative classes
-python prepare_vaani_data.py \
-    --vaani_dir ./data/vaani_raw \
-    --speech_commands_dir ./data/processed \
-    --out_dir ./data/vaani_processed \
-    --held_out_speakers speaker_03
+### 2. Deploy to ESP32 / ESP32-S3
 
-# Step D: Train the 3-class DS-CNN model
-python train.py --data_dir ./data/vaani_processed --out_dir ./artifacts --epochs 40
+The `esp32_deployment/` folder is ready to flash via Arduino IDE or PlatformIO:
 
-# Step E: Quantize to full-integer INT8 TFLite model (~13.7 KB)
-python quantize.py --model_path ./artifacts/final_model.keras --data_dir ./data/vaani_processed --out_dir ./artifacts
+1. Connect an I2S MEMS microphone (e.g., **INMP441**, **ICS-43434**, or **SPH0645**):
+   * `SCK / BCLK` $\rightarrow$ GPIO 14
+   * `WS / LRCLK` $\rightarrow$ GPIO 15
+   * `SD / DOUT`  $\rightarrow$ GPIO 32
+   * `VDD` $\rightarrow$ 3.3V | `GND` $\rightarrow$ GND
+2. Open `esp32_deployment/esp32_vaani_wakeword.ino` in Arduino IDE.
+3. Install **esp32** board support and **TensorFlowLite_ESP32** library.
+4. Upload to your board and open Serial Monitor at **115200 baud**.
+
+To regenerate microcontroller C headers after any model retrain:
+```bash
+python export_model_to_c.py
 ```
 
 ---
 
-### 2. Phase 2: Test on PC (WAVs & Live Mic)
+## Pipeline Walkthrough (Phases 1 – 5)
 
-```bash
-cd ../phase2
-pip install -r requirements.txt
+### Phase 1: Prototype & Model Architecture
+* DS-CNN (Depthwise Separable Convolutional Neural Network) architecture optimized for microcontrollers.
+* Full-integer INT8 quantization reducing model footprint from float32 to ~13.4 KB.
 
-# Offline batch evaluation: accuracy, FAR, FRR on held-out Vaani test voices
-python eval_wav.py \
-    --tflite_path ../phase1/artifacts/vaani_int8.tflite \
-    --data_dir ../phase1/data/vaani_processed/testing
+### Phase 2: PC Validation
+* Offline multi-class confusion matrix, FAR, FRR, and latency benchmarks.
+* Streaming audio circular buffer evaluation with variable confidence thresholds.
 
-# Live microphone detection: rolling 1-second buffer testing
-python mic_stream.py --tflite_path ../phase1/artifacts/vaani_int8.tflite --threshold 0.7
-```
+### Phase 3: Speaker Diversity & Zero-Leakage Partition
+* 352 real-world recordings across diverse team speakers (Ananya, Ark, Ishita, Mayank, Vitthal).
+* Guaranteed zero speaker leakage between train, validation, and unseen holdout splits.
+* Automated normalization to 16kHz mono 16-bit PCM WAV.
+
+### Phase 4: Robustness & Microcontroller Profiling
+* Continuous sliding window simulation over hours of mixed audio.
+* Stress testing with background noise (babble, traffic, white noise) at varying SNR levels (0 to 15 dB).
+* Microcontroller resource estimation: Flash memory, SRAM Tensor Arena headroom, and CPU cycles.
+
+### Phase 5: Hard Negative Mining & Model V2
+* Hard negative mining on phonetically similar near-misses ("Paani", "Rani", "Naani", "Kahaani").
+* Dual-target optimization balancing high recall for varied speech tempos with near-miss rejection.
+* Model V2 achieved **100.0% recall on unseen test speaker** (Vitthal) and **100.0% false trigger rejection** on near-miss words.
 
 ---
 
-### 3. Phase 3: Real Speaker Diversity & Generalization
+## Hardware Resource Specifications
 
-```bash
-cd ../phase3
-pip install -r requirements.txt
-
-# Step A: Record real speakers saying target words
-python record_speakers.py --speaker_id alice --reps 15
-
-# Step B: Multiply recordings with noise/speed/pitch augmentation
-python augment.py \
-    --in_dir ./data/speakers \
-    --out_dir ./data/speakers_augmented \
-    --noise_dir ../phase1/data/raw/_background_noise_
-
-# Step C: Split speakers with unseen holdouts
-python speaker_split.py \
-    --in_dir ./data/speakers_augmented \
-    --out_dir ./data/speakers_processed \
-    --held_out_speakers charlie
-
-# Step D: Merge with base negative data
-python merge_with_phase1.py \
-    --phase1_dir ../phase1/data/processed \
-    --phase3_dir ./data/speakers_processed \
-    --out_dir ./data/combined
-
-# Step E: Evaluate generalization gap on seen vs. unseen voices
-python eval_by_speaker.py \
-    --tflite_path ../phase1/artifacts/vaani_int8.tflite \
-    --speakers_dir ./data/speakers \
-    --held_out_speakers charlie
-```
+| Metric | Target Budget | Vaani Model V2 (INT8) | Status |
+| :--- | :--- | :--- | :--- |
+| **Model Flash Footprint** | $< 256\text{ KB}$ | **13.38 KB** (13,696 bytes) | PASS (94.8% headroom) |
+| **SRAM (Tensor Arena)** | $< 100\text{ KB}$ | **~26 KB** (~45 KB reserved) | PASS (> 250 KB free SRAM) |
+| **Inference Latency** | $< 100\text{ ms}$ | **~14.5 ms** (ESP32-S3) / **0.12 ms** (PC) | PASS |
+| **Audio Format** | 16 kHz Mono | 16 kHz Mono PCM (1.0s window, 100ms hop) | PASS |

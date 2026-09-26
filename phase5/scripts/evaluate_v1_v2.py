@@ -87,10 +87,17 @@ def apply_volume(audio: np.ndarray, db_gain: float) -> np.ndarray:
 
 
 def apply_speed(audio: np.ndarray, speed: float) -> np.ndarray:
-    stretched = librosa.effects.time_stretch(audio, rate=speed)
-    if len(stretched) < CLIP_LEN:
-        return np.pad(stretched, (0, CLIP_LEN - len(stretched)), mode="constant")
-    return stretched[:CLIP_LEN].astype(np.float32)
+    try:
+        if len(audio) < 2048:
+            audio = np.pad(audio, (0, 2048 - len(audio)), mode="constant")
+        stretched = librosa.effects.time_stretch(audio, rate=speed)
+        if len(stretched) < CLIP_LEN:
+            return np.pad(stretched, (0, CLIP_LEN - len(stretched)), mode="constant")
+        return stretched[:CLIP_LEN].astype(np.float32)
+    except Exception:
+        if len(audio) < CLIP_LEN:
+            return np.pad(audio, (0, CLIP_LEN - len(audio)), mode="constant")
+        return audio[:CLIP_LEN].astype(np.float32)
 
 
 def generate_noise(noise_type: str, length: int) -> np.ndarray:
@@ -336,6 +343,31 @@ def run_benchmark(
                 "fpr": round(fpr * 100, 2),
             }
             print(f"[{m_name}] @ th={th:.2f} | Precision: {prec*100:.1f}% | Recall: {rec*100:.1f}% | F1: {f1*100:.1f}% | FPR: {fpr*100:.2f}% (FP: {fp}/{fp+tn})")
+
+    # 6. Unseen Hard Negatives Rejection (Vitthal Near-Misses)
+    print("\n--- 6. Unseen Hard Negatives False Trigger Rejection (Vitthal Near-Misses) ---")
+    results["unseen_hard_negatives"] = {}
+    test_unknown_dir = test_combined / "unknown"
+    vitthal_hn_files = list(test_unknown_dir.glob("*vitthal*.wav")) if test_unknown_dir.exists() else []
+    if vitthal_hn_files:
+        print(f"Found {len(vitthal_hn_files)} unseen hard negative clips from Vitthal.")
+        for th in (0.40, 0.50):
+            v1_fp, v2_fp = 0, 0
+            for w in vitthal_hn_files:
+                audio, _ = sf.read(str(w))
+                if v1.predict_audio(audio)[VAANI_IDX] >= th:
+                    v1_fp += 1
+                if v2.predict_audio(audio)[VAANI_IDX] >= th:
+                    v2_fp += 1
+            n_tot = len(vitthal_hn_files)
+            results["unseen_hard_negatives"][f"th{int(th*100)}"] = {
+                "total_clips": n_tot,
+                "v1_false_triggers": v1_fp,
+                "v2_false_triggers": v2_fp,
+                "v1_rejection_rate": round((1.0 - v1_fp / n_tot) * 100, 1),
+                "v2_rejection_rate": round((1.0 - v2_fp / n_tot) * 100, 1),
+            }
+            print(f"@ th={th:.2f} | V1 False Triggers: {v1_fp}/{n_tot} ({v1_fp/n_tot*100:.1f}%) -> V2 False Triggers: {v2_fp}/{n_tot} ({v2_fp/n_tot*100:.1f}%)")
 
     out_file = out_dir / "v1_vs_v2_results.json"
     with open(out_file, "w") as fp:

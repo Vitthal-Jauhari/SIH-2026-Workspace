@@ -78,6 +78,28 @@ def generate_silence_clips(out_dir: Path, n_needed: int, prefix: str):
         sf.write(str(out_file), clip, SAMPLE_RATE, subtype="PCM_16")
 
 
+def ensure_speech_commands(sc_dir: Path):
+    """Ensures Google mini_speech_commands dataset is present, downloading if necessary."""
+    sc_dir = sc_dir.resolve()
+    if sc_dir.exists() and any(d.is_dir() for d in sc_dir.iterdir() if not d.name.startswith(".")):
+        return
+
+    import urllib.request
+    import zipfile
+
+    sc_dir.parent.mkdir(parents=True, exist_ok=True)
+    zip_path = sc_dir.parent / "mini_speech_commands.zip"
+    url = "http://storage.googleapis.com/download.tensorflow.org/data/mini_speech_commands.zip"
+    print(f">> Downloading mini_speech_commands from {url} ...")
+    urllib.request.urlretrieve(url, str(zip_path))
+    print(f">> Extracting to {sc_dir.parent} ...")
+    with zipfile.ZipFile(str(zip_path), "r") as z:
+        z.extractall(str(sc_dir.parent))
+    if zip_path.exists():
+        zip_path.unlink()
+    print(">> Speech commands dataset ready.\n")
+
+
 def build_combined_dataset(
     vaani_dir: Path,
     sc_dir: Path,
@@ -103,6 +125,8 @@ def build_combined_dataset(
     print(f"Combined destination  : {out_dir}")
     print(f"Held-out Unseen test  : {sorted(held_out_set)}")
     print(f"Validation speakers   : {sorted(val_set)}\n")
+
+    ensure_speech_commands(sc_dir)
 
     # Clean existing destination
     if out_dir.exists():
@@ -180,12 +204,9 @@ def build_combined_dataset(
     random.shuffle(all_sc_pool)
 
     # Balance counts with Vaani classes
-    # Train: 700 unknown, 700 silence (to match ~690 Vaani)
-    # Val: 100 unknown, 100 silence (to match ~42 Vaani)
-    # Test: 100 unknown, 100 silence (to match ~26 Vaani)
     n_train_neg = max(n_train_vaani, 700)
-    n_val_neg = 100
-    n_test_neg = 100
+    n_val_neg = max(n_val_vaani, 100)
+    n_test_neg = max(n_test_vaani, 100)
 
     idx = 0
     # Training unknown

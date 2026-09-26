@@ -1,5 +1,5 @@
 {
-  "model_path": "C:\\Users\\Asus\\OneDrive\\Documents\\SIH-2026\\Vaani\\phase3\\artifacts\\vaani_int8.tflite",
+  "model_path": "phase3/artifacts/vaani_int8.tflite",
   "model_filename": "vaani_int8.tflite",
   "sha256": "2c05085e251a800f8176fdb33b3ed4d812782dd10305788ddcffe0132d59d88e",
   "size_bytes": 13712,
