@@ -1,11 +1,9 @@
 /**
  * @file kws_model.h
- * @brief TFLite Micro wrapper for the Vaani DSCNN wakeword model
+ * @brief TFLite Micro wrapper for the Vaani V2 DS-CNN wakeword model
  *
  * Loads the INT8 quantized model, registers the required operators,
- * and provides a simple C-callable interface for running inference.
- *
- * Internally uses C++ (TFLite Micro API), exposed via extern "C".
+ * and provides a C-callable interface for running inference.
  */
 
 #ifndef KWS_MODEL_H_
@@ -25,19 +23,20 @@ extern "C" {
 int kws_model_init(void);
 
 /**
- * @brief Run wakeword inference on extracted features.
+ * @brief Run wakeword inference on extracted 63x13 MFCC features.
  *
  * Quantizes float32 features to INT8 using the model's input
  * scale/zero-point, invokes the interpreter, and dequantizes
- * the output probabilities.
+ * the 3 output class probabilities.
  *
- * @param features   Pointer to 40×49 = 1960 float32 log-mel features.
- *                   Layout: [mel_bin][frame], matching (1,40,49,1) tensor.
- * @param p_negative Output: probability of class 0 (negative / not Vaani).
- * @param p_vaani    Output: probability of class 1 (Vaani detected).
+ * @param features   Pointer to 63 × 13 = 819 float32 MFCC features.
+ *                   Layout: [frame][mfcc], matching (1, 63, 13, 1) tensor.
+ * @param p_silence  Output: probability of class 0 (Silence).
+ * @param p_unknown  Output: probability of class 1 (Unknown speech / Negative).
+ * @param p_vaani    Output: probability of class 2 (Vaani wakeword detected).
  * @return 0 on success, -1 on inference failure.
  */
-int kws_model_run(const float *features, float *p_negative, float *p_vaani);
+int kws_model_run(const float *features, float *p_silence, float *p_unknown, float *p_vaani);
 
 #ifdef __cplusplus
 }

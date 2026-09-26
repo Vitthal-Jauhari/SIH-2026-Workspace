@@ -28,7 +28,7 @@ static const char *TAG = "VAD";
 
 #define VAD_THRESHOLD_DB    (-45.0f)
 #define VAD_START_FRAMES    2
-#define VAD_END_FRAMES      5
+#define VAD_END_FRAMES      20          /* 20 frames = 600 ms hangover to cover 1s buffer */
 
 
 /* ================================================================

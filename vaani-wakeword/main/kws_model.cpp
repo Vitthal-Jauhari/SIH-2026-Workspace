@@ -1,14 +1,10 @@
 /**
  * @file kws_model.cpp
- * @brief TFLite Micro wrapper for the Vaani DSCNN wakeword model
+ * @brief TFLite Micro wrapper for the Vaani V2 DS-CNN wakeword model
  *
  * Loads the INT8 quantized model embedded in model_data.cc,
- * registers the 6 operators used by the DSCNN architecture,
- * and provides C-callable functions for initialization and
- * inference.
- *
- * Ported from v1/v1/src/main.cpp (PlatformIO/Arduino) to
- * ESP-IDF native.
+ * registers operators used by the V2 architecture, and provides
+ * C-callable functions for initialization and inference.
  */
 
 #include "kws_model.h"
@@ -29,7 +25,7 @@ static const char *TAG = "KWS_MODEL";
  * Tensor arena
  * ================================================================ */
 
-static constexpr size_t kTensorArenaSize = 64 * 1024;
+static constexpr size_t kTensorArenaSize = 20 * 1024;
 alignas(16) static uint8_t s_tensor_arena[kTensorArenaSize];
 
 
@@ -38,14 +34,14 @@ alignas(16) static uint8_t s_tensor_arena[kTensorArenaSize];
  * ================================================================ */
 
 static const tflite::Model      *s_model       = nullptr;
-static tflite::MicroInterpreter *s_interpreter  = nullptr;
-static TfLiteTensor             *s_input        = nullptr;
-static TfLiteTensor             *s_output       = nullptr;
+static tflite::MicroInterpreter *s_interpreter = nullptr;
+static TfLiteTensor             *s_input       = nullptr;
+static TfLiteTensor             *s_output      = nullptr;
 
 /* Quantization parameters (read from model after init). */
-static float s_input_scale      = 0.0f;
-static int   s_input_zero_point = 0;
-static float s_output_scale     = 0.0f;
+static float s_input_scale       = 0.0f;
+static int   s_input_zero_point  = 0;
+static float s_output_scale      = 0.0f;
 static int   s_output_zero_point = 0;
 
 
@@ -55,7 +51,7 @@ static int   s_output_zero_point = 0;
 
 extern "C" int kws_model_init(void)
 {
-    ESP_LOGI(TAG, "Loading model (%u bytes)...", g_vaani_model_data_len);
+    ESP_LOGI(TAG, "Loading V2 model (%u bytes)...", g_vaani_model_data_len);
 
     /* ----------------------------------------------------------
      * 1. Load model from flash
@@ -79,14 +75,14 @@ extern "C" int kws_model_init(void)
 
 
     /* ----------------------------------------------------------
-     * 2. Register only the operators our DSCNN model uses
+     * 2. Register operators used by V2 DS-CNN architecture:
+     *    Conv2D, DepthwiseConv2D, Mean, FullyConnected, Softmax
      * ---------------------------------------------------------- */
 
-    static tflite::MicroMutableOpResolver<6> resolver;
+    static tflite::MicroMutableOpResolver<5> resolver;
 
     if (resolver.AddConv2D()          != kTfLiteOk ||
         resolver.AddDepthwiseConv2D() != kTfLiteOk ||
-        resolver.AddMaxPool2D()       != kTfLiteOk ||
         resolver.AddMean()            != kTfLiteOk ||
         resolver.AddFullyConnected()  != kTfLiteOk ||
         resolver.AddSoftmax()         != kTfLiteOk)
@@ -95,7 +91,7 @@ extern "C" int kws_model_init(void)
         return -1;
     }
 
-    ESP_LOGI(TAG, "6 operators registered");
+    ESP_LOGI(TAG, "5 operators registered");
 
 
     /* ----------------------------------------------------------
@@ -134,9 +130,9 @@ extern "C" int kws_model_init(void)
      * 5. Read quantization parameters
      * ---------------------------------------------------------- */
 
-    s_input_scale      = s_input->params.scale;
-    s_input_zero_point = s_input->params.zero_point;
-    s_output_scale     = s_output->params.scale;
+    s_input_scale       = s_input->params.scale;
+    s_input_zero_point  = s_input->params.zero_point;
+    s_output_scale      = s_output->params.scale;
     s_output_zero_point = s_output->params.zero_point;
 
 
@@ -154,6 +150,7 @@ extern "C" int kws_model_init(void)
 
     ESP_LOGI(TAG, "--- OUTPUT TENSOR ---");
     ESP_LOGI(TAG, "  Type      : %d", s_output->type);
+    ESP_LOGI(TAG, "  Classes   : %d", s_output->dims->data[1]);
     ESP_LOGI(TAG, "  Scale     : %.10f", s_output_scale);
     ESP_LOGI(TAG, "  Zero point: %d", s_output_zero_point);
 
@@ -161,7 +158,7 @@ extern "C" int kws_model_init(void)
     ESP_LOGI(TAG, "Tensor arena used: %u / %u bytes",
              (unsigned)arena_used, (unsigned)kTensorArenaSize);
 
-    ESP_LOGI(TAG, "Model ready.");
+    ESP_LOGI(TAG, "V2 Model ready.");
     return 0;
 }
 
@@ -171,17 +168,16 @@ extern "C" int kws_model_init(void)
  * ================================================================ */
 
 extern "C" int kws_model_run(const float *features,
-                              float *p_negative, float *p_vaani)
+                              float *p_silence, float *p_unknown, float *p_vaani)
 {
     /* ----------------------------------------------------------
-     * Quantize float32 features → INT8
-     *
+     * Quantize float32 features -> INT8:
      *   quantized = round(value / scale) + zero_point
      *   clamped to [-128, 127]
      * ---------------------------------------------------------- */
 
     int8_t *input_data = s_input->data.int8;
-    int     total      = s_input->bytes;    /* 40 * 49 = 1960 */
+    int     total      = s_input->bytes;    /* 63 * 13 = 819 */
 
     for (int i = 0; i < total; i++) {
         float q = roundf(features[i] / s_input_scale)
@@ -205,16 +201,24 @@ extern "C" int kws_model_run(const float *features,
 
 
     /* ----------------------------------------------------------
-     * Dequantize INT8 output → float32
-     *
+     * Dequantize 3 INT8 outputs -> float32 probabilities:
      *   real_value = (quantized - zero_point) * scale
      * ---------------------------------------------------------- */
 
-    *p_negative = (float)(s_output->data.int8[0] - s_output_zero_point)
-                * s_output_scale;
+    if (p_silence) {
+        *p_silence = (float)(s_output->data.int8[0] - s_output_zero_point)
+                   * s_output_scale;
+    }
 
-    *p_vaani    = (float)(s_output->data.int8[1] - s_output_zero_point)
-                * s_output_scale;
+    if (p_unknown) {
+        *p_unknown = (float)(s_output->data.int8[1] - s_output_zero_point)
+                   * s_output_scale;
+    }
+
+    if (p_vaani) {
+        *p_vaani   = (float)(s_output->data.int8[2] - s_output_zero_point)
+                   * s_output_scale;
+    }
 
     return 0;
 }
