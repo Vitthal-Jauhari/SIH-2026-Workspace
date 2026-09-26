@@ -26,7 +26,7 @@ static const char *TAG = "VAD";
  * Configuration  —  tune these for your environment
  * ================================================================ */
 
-#define VAD_THRESHOLD_DB    (-45.0f)
+#define VAD_THRESHOLD_DB    (-34.0f)
 #define VAD_START_FRAMES    2
 #define VAD_END_FRAMES      20          /* 20 frames = 600 ms hangover to cover 1s buffer */
 
@@ -108,11 +108,13 @@ float vad_process_frame(const int16_t *frame, size_t num_samples)
     /* Activate after consecutive speech frames */
     if (!s_active && s_speech_frames >= VAD_START_FRAMES) {
         s_active = true;
+        ESP_LOGI(TAG, "Speech START (energy: %.1f dBFS >= threshold %.1f)", db, VAD_THRESHOLD_DB);
     }
 
     /* Deactivate after consecutive silent frames */
     if (s_active && s_silent_frames >= VAD_END_FRAMES) {
         s_active = false;
+        ESP_LOGI(TAG, "Speech END (energy: %.1f dBFS < threshold %.1f)", db, VAD_THRESHOLD_DB);
     }
 
     return db;

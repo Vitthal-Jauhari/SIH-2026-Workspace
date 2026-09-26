@@ -52,6 +52,11 @@ static const char *TAG = "VAANI";
 #define AUDIO_BUF_SAMPLES   16000       /* 1 second */
 #define KWS_HOP_SAMPLES     3200        /* 200 ms at 16 kHz */
 #define KWS_THRESHOLD       0.80f
+#define KWS_MIN_CONSECUTIVE 2       /* Require 2 consecutive windows to confirm — filters
+                                       isolated single-window spikes; does NOT filter
+                                       sustained multi-window false-positive clusters
+                                       (e.g. the 4-consecutive-window run seen in
+                                       true_silence.wav testing) — that needs the model fix. */
 
 #define LED_INDICATOR_GPIO  2
 #define LED_HOLD_TIME_US    2000000ULL
@@ -168,6 +173,7 @@ static void kws_infer_task(void *arg)
     static float features[TOTAL_FEATURES];
     int total_detections = 0;
     int64_t led_off_time = 0;
+    int s_consecutive_hits = 0;
 
     ESP_LOGI(TAG, "[core1] kws_infer_task started");
 
@@ -202,17 +208,25 @@ static void kws_infer_task(void *arg)
             continue;
         }
 
-        bool detected = (p_vaani >= KWS_THRESHOLD);
+        bool raw_hit = (p_vaani >= KWS_THRESHOLD);
 
-        if (detected) {
-            total_detections++;
-            gpio_set_level(LED_INDICATOR_GPIO, 1);
-            led_off_time = esp_timer_get_time() + LED_HOLD_TIME_US;
+        if (raw_hit) {
+            s_consecutive_hits++;
+            /* Equality (not >=) is deliberate: fires exactly once per sustained
+             * utterance rather than re-triggering the LED on every window of a
+             * multi-window hit. Counter keeps climbing past this point but is
+             * never re-checked until it resets to 0 in the else branch below. */
+            if (s_consecutive_hits == KWS_MIN_CONSECUTIVE) {
+                total_detections++;
+                gpio_set_level(LED_INDICATOR_GPIO, 1);
+                led_off_time = esp_timer_get_time() + LED_HOLD_TIME_US;
 
-            ESP_LOGW(TAG,
-                "***  VAANI DETECTED!  ***  P(Vaani)=%.4f  [feat %lld us | infer %lld us]  [total: %d]",
-                p_vaani, t_feat, t_infer, total_detections);
+                ESP_LOGW(TAG,
+                    "***  VAANI DETECTED! (confirmed %d windows)  ***  P(Vaani)=%.4f  [feat %lld us | infer %lld us]  [total: %d]",
+                    s_consecutive_hits, p_vaani, t_feat, t_infer, total_detections);
+            }
         } else {
+            s_consecutive_hits = 0;
             ESP_LOGI(TAG,
                 "P(Vaani)=%.4f  P(Unknown)=%.4f  [feat %lld us | infer %lld us]",
                 p_vaani, p_unknown, t_feat, t_infer);

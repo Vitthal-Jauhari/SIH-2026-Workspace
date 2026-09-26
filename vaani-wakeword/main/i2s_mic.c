@@ -169,7 +169,7 @@ esp_err_t i2s_mic_read(int16_t *out_buf, size_t num_samples)
     size_t samples_read = bytes_read / sizeof(int32_t);
 
     for (size_t i = 0; i < samples_read; i++) {
-        int32_t s = s_raw_buf[i] >> 14;
+        int32_t s = s_raw_buf[i] >> 16;
         if (s > 32767)  s = 32767;
         if (s < -32768) s = -32768;
         out_buf[i] = (int16_t)s;
